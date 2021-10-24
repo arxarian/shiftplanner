@@ -1,10 +1,10 @@
 #pragma once
 
-#include "shiftitem.h"
+#include "skillitem.h"
 
 #include <QAbstractListModel>
 
-class OperatorModel : public QAbstractListModel
+class SkillModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
@@ -14,12 +14,13 @@ public:
     };
     Q_ENUM(Roles)
 
-    explicit OperatorModel(QObject* parent = nullptr);
+    explicit SkillModel(QObject* parent = nullptr);
+    explicit SkillModel(QSet<SkillItem::Skill> skills, QObject* parent = nullptr);
 
     Q_INVOKABLE virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     Q_INVOKABLE virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     Q_INVOKABLE virtual QHash<int, QByteArray> roleNames() const override;
 
 private:
-    QList<OperatorItem*> m_arrOperatorItems;
+    QList<SkillItem*> m_arrSkillItems;
 };

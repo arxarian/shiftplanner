@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "sources/workers/workermodel.h"
+
 #include <QMainWindow>
 
 QT_BEGIN_NAMESPACE
@@ -23,5 +25,7 @@ private slots:
 
 private:
     Ui::MainWindow* ui;
+
+    WorkerModel* m_workers = nullptr;
 };
 #endif // MAINWINDOW_H

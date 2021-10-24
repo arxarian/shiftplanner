@@ -1,13 +1,14 @@
 #include "skillmodel.h"
 
 #include <QPointer>
+#include <QSet>
 
 SkillModel::SkillModel(QObject* parent) : QAbstractListModel(parent)
 {
     //
 }
 
-SkillModel::SkillModel(QSet<QString> skills, QObject* parent)
+SkillModel::SkillModel(QSet<SkillItem::Skill> skills, QObject* parent)
 {
     //
 }

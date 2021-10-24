@@ -11,21 +11,27 @@ CONFIG += c++11
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    sources/skillitem.cpp \
-    sources/skillmodel.cpp \
-    sources/shiftitem.cpp \
-    sources/shiftmodel.cpp \
-    sources/operatoritem.cpp \
-    sources/operatormodel.cpp
+    sources/workers/workeritem.cpp \
+    sources/workers/workermodel.cpp \
+    sources/skills/skillitem.cpp \
+    sources/skills/skillmodel.cpp \
+    sources/availability/availabilityitem.cpp \
+    sources/availability/availabilitymodel.cpp \
+    sources/availability/availabilitytablemodel.cpp \
+    sources/shifts/shiftitem.cpp \
+    sources/shifts/shiftmodel.cpp
 
 HEADERS += \
     mainwindow.h \
-    sources/skillitem.h \
-    sources/skillmodel.h \
-    sources/shiftitem.h \
-    sources/shiftmodel.h \
-    sources/operatoritem.h \
-    sources/operatormodel.h
+    sources/workers/workeritem.h \
+    sources/workers/workermodel.h \
+    sources/skills/skillitem.h \
+    sources/skills/skillmodel.h \
+    sources/availability/availabilityitem.h \
+    sources/availability/availabilitymodel.h \
+    sources/availability/availabilitytablemodel.h \
+    sources/shifts/shiftitem.h \
+    sources/shifts/shiftmodel.h
 
 FORMS += \
     mainwindow.ui
