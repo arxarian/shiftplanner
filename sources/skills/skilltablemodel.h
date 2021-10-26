@@ -1,16 +1,13 @@
 #pragma once
 
-#include "../workers/workeritem.h"
-#include "../workers/workermodel.h"
-
 #include <QAbstractTableModel>
 
-class AvailabilityTableModel : public QAbstractTableModel
+class SkillHourTableModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    explicit AvailabilityTableModel(QObject* parent = nullptr);
+    explicit SkillHourTableModel(QObject* parent = nullptr);
 
     virtual int rowCount(const QModelIndex& parent) const override;
     virtual int columnCount(const QModelIndex& parent) const override;
@@ -20,15 +17,14 @@ public:
     QStringList workers() const;
 
 public slots:
-    void setDates(const QStringList& dates);
-    void setWorkersAvailabitilty(const QStringList& workersAvailabitilty);
+    void setWorkersSkillsAndHours(const QStringList& workersSkills);
 
 signals:
     void workersChanged(QStringList workers);
 
 private:
-    QStringList m_dates;
     QStringList m_workers;
 
-    QMap<QString, QStringList> m_workersAvailabitilty;
+    QMap<QString, QStringList> m_workersSkills;
+    QMap<QString, qint32> m_workersHours;
 };

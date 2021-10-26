@@ -15,6 +15,7 @@ SOURCES += \
     sources/workers/workermodel.cpp \
     sources/skills/skillitem.cpp \
     sources/skills/skillmodel.cpp \
+    sources/skills/skilltablemodel.cpp \
     sources/availability/availabilityitem.cpp \
     sources/availability/availabilitymodel.cpp \
     sources/availability/availabilitytablemodel.cpp \
@@ -27,6 +28,7 @@ HEADERS += \
     sources/workers/workermodel.h \
     sources/skills/skillitem.h \
     sources/skills/skillmodel.h \
+    sources/skills/skilltablemodel.h \
     sources/availability/availabilityitem.h \
     sources/availability/availabilitymodel.h \
     sources/availability/availabilitytablemodel.h \

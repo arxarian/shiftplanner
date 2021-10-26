@@ -13,15 +13,20 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     ui->setupUi(this);
 
-    connect(ui->addOperatorsButton, &QToolButton::clicked, this, &MainWindow::AddOperators);
+    connect(ui->toolButtonAvailabilityFrame, &QToolButton::clicked, this, [this] { ui->stackedWidget->setCurrentIndex(0); });
+    connect(ui->toolButtonWorkersFrame, &QToolButton::clicked, this, [this] { ui->stackedWidget->setCurrentIndex(1); });
 
-    m_workers = new WorkerModel(this);
+    connect(ui->pushButtonAddWorkers, &QPushButton::clicked, this, &MainWindow::AddAvailability);
+    connect(ui->pushButtonAddSkills, &QPushButton::clicked, this, &MainWindow::AddSkillsAndHours);
 
-    AddOperators(); // TODO - move as the last to test bindings
+    m_availabilityModel = new AvailabilityTableModel(this);
+    ui->tableViewAvailability->setModel(m_availabilityModel);
 
-    AvailabilityTableModel* tableModel = new AvailabilityTableModel(this);
-    tableModel->setWorkers(m_workers);
-    ui->tableView->setModel(tableModel);
+    m_skillsAndHoursModel = new SkillHourTableModel(this);
+    ui->tableViewSkills->setModel(m_skillsAndHoursModel);
+
+    AddAvailability();
+    AddSkillsAndHours();
 }
 
 MainWindow::~MainWindow()
@@ -29,7 +34,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::AddOperators()
+void MainWindow::AddAvailability()
 {
     // model must take the ownership
 
@@ -39,27 +44,28 @@ void MainWindow::AddOperators()
     //    QClipboard* clipboard = QGuiApplication::clipboard();
     //    const QString& text   = clipboard->text();
 
+    QStringList&& rows         = text.split(QChar::LineFeed);
+    QString&& horizontalHeader = rows.takeFirst();
+    //    rows.removeFirst(); // useless data
+
+    QStringList&& dates = horizontalHeader.split(QChar::Tabulation);
+    dates.removeFirst();
+    m_availabilityModel->setDates(dates);
+
+    m_availabilityModel->setWorkersAvailabitilty(rows);
+
+    ui->tableViewAvailability->resizeColumnsToContents();
+}
+
+void MainWindow::AddSkillsAndHours()
+{
+    const QString& text = QString("\tSenior\tProject\tCovidt\tReservations\tResidences\tHours"
+                                  "\nPavel\tX\tANO\tX\tX\t\t80\nKarel\t\tNE\t\t\tX\t80\nSimona\tX\tANO\t\t\tX\t80\n");
+
     QStringList&& rows = text.split(QChar::LineFeed);
-    //    rows.removeAt(1);  //
-    rows.removeLast(); // it's an empty row anyway
-    const QStringList& rawDates = rows.takeFirst().split(QChar::Tabulation);
+    rows.removeFirst();
 
-    // extract dates
-    QList<QDate> dates;
-    for (const QString& rawDate : rawDates)
-    {
-        if (!rawDate.isEmpty())
-        {
-            const QStringList& dayAndMonth = rawDate.split(QChar('.'));
-            dates.append(QDate(QDate::currentDate().year(), dayAndMonth.at(1).toInt(), dayAndMonth.at(0).toInt()));
-        }
-    }
+    m_skillsAndHoursModel->setWorkersSkillsAndHours(rows);
 
-    // create worker list
-    for (const QString& row : rows)
-    {
-        AvailabilityModel* availabilities = new AvailabilityModel(dates, row.mid(row.indexOf(QChar::Tabulation) + 1).split(QChar::Tabulation));
-        const QString& worker             = row.left(row.indexOf(QChar::Tabulation));
-        m_workers->append(new WorkerItem(worker, 80, availabilities));
-    }
+    //        ui->tableViewSkills->resizeColumnsToContents();
 }
