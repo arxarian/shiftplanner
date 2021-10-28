@@ -2,7 +2,13 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++11
+CONFIG += c++17
+
+INCLUDEPATH += 3rdparty/or-tools/include
+
+unix {
+    LIBS += -L"$$PWD/3rdparty/or-tools/lib" -lortools
+}
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -11,6 +17,7 @@ CONFIG += c++11
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    sources/planner/planner.cpp \
     sources/workers/workeritem.cpp \
     sources/workers/workermodel.cpp \
     sources/skills/skillitem.cpp \
@@ -24,6 +31,7 @@ SOURCES += \
 
 HEADERS += \
     mainwindow.h \
+    sources/planner/planner.h \
     sources/workers/workeritem.h \
     sources/workers/workermodel.h \
     sources/skills/skillitem.h \
