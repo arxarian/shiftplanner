@@ -15,6 +15,8 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
     QStringList workers() const;
+    QMap<QString, QStringList> workersSkills();
+    QMap<QString, qint32> workersHours();
 
 public slots:
     void setWorkersSkillsAndHours(const QStringList& workersSkills);

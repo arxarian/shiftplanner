@@ -84,6 +84,16 @@ QStringList AvailabilityTableModel::workers() const
     return m_workers;
 }
 
+QStringList AvailabilityTableModel::dates() const
+{
+    return m_dates;
+}
+
+QMap<QString, QStringList> AvailabilityTableModel::workersAvailabitilty()
+{
+    return m_workersAvailabitilty;
+}
+
 // WorkerModel* AvailabilityTableModel::workers() const
 //{
 //    return m_workers;

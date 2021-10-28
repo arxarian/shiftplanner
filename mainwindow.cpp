@@ -13,16 +13,19 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     ui->setupUi(this);
 
+    m_planner             = new Planner(this);
+    m_availabilityModel   = new AvailabilityTableModel(this);
+    m_skillsAndHoursModel = new SkillHourTableModel(this);
+
     connect(ui->toolButtonAvailabilityFrame, &QToolButton::clicked, this, [this] { ui->stackedWidget->setCurrentIndex(0); });
     connect(ui->toolButtonWorkersFrame, &QToolButton::clicked, this, [this] { ui->stackedWidget->setCurrentIndex(1); });
+    connect(ui->toolButtonShiftsFrame, &QToolButton::clicked, this, [this] { ui->stackedWidget->setCurrentIndex(2); });
 
     connect(ui->pushButtonAddWorkers, &QPushButton::clicked, this, &MainWindow::AddAvailability);
     connect(ui->pushButtonAddSkills, &QPushButton::clicked, this, &MainWindow::AddSkillsAndHours);
+    connect(ui->pushButtonGenerate, &QPushButton::clicked, this, &MainWindow::Plan);
 
-    m_availabilityModel = new AvailabilityTableModel(this);
     ui->tableViewAvailability->setModel(m_availabilityModel);
-
-    m_skillsAndHoursModel = new SkillHourTableModel(this);
     ui->tableViewSkills->setModel(m_skillsAndHoursModel);
 
     AddAvailability();
@@ -68,4 +71,9 @@ void MainWindow::AddSkillsAndHours()
     m_skillsAndHoursModel->setWorkersSkillsAndHours(rows);
 
     //        ui->tableViewSkills->resizeColumnsToContents();
+}
+
+void MainWindow::Plan()
+{
+    m_planner->Plan(m_availabilityModel, m_skillsAndHoursModel);
 }

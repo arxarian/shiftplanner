@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "sources/availability/availabilitytablemodel.h"
+#include "sources/planner/planner.h"
 #include "sources/skills/skilltablemodel.h"
 
 #include <QMainWindow>
@@ -24,12 +25,14 @@ public:
 private slots:
     void AddAvailability();
     void AddSkillsAndHours();
+    void Plan();
 
 private:
     Ui::MainWindow* ui;
 
     AvailabilityTableModel* m_availabilityModel = nullptr;
     SkillHourTableModel* m_skillsAndHoursModel  = nullptr;
+    Planner* m_planner                          = nullptr;
 
     //    QMap<QString, QStringList> m_workersAvailabitilty;
     //    QMap<QString, QSet<QString>> m_workersSkills;

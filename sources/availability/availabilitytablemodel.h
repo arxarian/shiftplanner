@@ -18,6 +18,8 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
     QStringList workers() const;
+    QStringList dates() const;
+    QMap<QString, QStringList> workersAvailabitilty();
 
 public slots:
     void setDates(const QStringList& dates);

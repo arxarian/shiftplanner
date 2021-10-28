@@ -78,6 +78,16 @@ QStringList SkillHourTableModel::workers() const
     return m_workers;
 }
 
+QMap<QString, QStringList> SkillHourTableModel::workersSkills()
+{
+    return m_workersSkills;
+}
+
+QMap<QString, qint32> SkillHourTableModel::workersHours()
+{
+    return m_workersHours;
+}
+
 void SkillHourTableModel::setWorkersSkillsAndHours(const QStringList& workersSkills)
 {
     m_workers.clear();
