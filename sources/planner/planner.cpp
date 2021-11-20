@@ -67,8 +67,8 @@ void Planner::ScheduleRequestsSat()
     }
 
     //! each shift is assigned to a min-to-max workers per day
-    const int min_workers = 2;
-    const int max_workers = 5;
+    const std::array min_workers = {1, 1, 2}; // Covid, Booking, Residences
+    const std::array max_workers = {3, 1, 5}; // Covid, Booking, Residences
     for (int d : all_slots)
     {
         for (int s : all_shifts)
@@ -79,8 +79,8 @@ void Planner::ScheduleRequestsSat()
                 auto key = std::make_tuple(n, d, s);
                 x.push_back(shifts[key]);
             }
-            cp_model.AddLessOrEqual(min_workers, LinearExpr::Sum(x));
-            cp_model.AddLessOrEqual(LinearExpr::Sum(x), max_workers);
+            cp_model.AddLessOrEqual(min_workers[s], LinearExpr::Sum(x));
+            cp_model.AddLessOrEqual(LinearExpr::Sum(x), max_workers[s]);
         }
     }
 
