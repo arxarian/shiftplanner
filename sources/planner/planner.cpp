@@ -8,6 +8,9 @@
 
 #include <QDebug>
 
+const QStringList SHIFTS  = {"COVID", "Reservations", "Residences"};
+const QStringList WORKERS = {"Karel", "Marek", "Karolina", "Lenka", "Simona", "Pavel", "Cupito", "Standa", "Julie", "Jakub"};
+
 Planner::Planner(QObject* parent) : QObject(parent)
 {
     //
@@ -31,7 +34,7 @@ void ScheduleRequestsSat()
     //! data definition
     const int num_workers = 10;
     const int num_shifts  = 3; // 6;
-    const int num_days    = 3;
+    const int num_days    = 10;
 
     std::vector<int> all_workers(num_workers);
     std::iota(all_workers.begin(), all_workers.end(), 0);
@@ -61,7 +64,7 @@ void ScheduleRequestsSat()
     }
 
     //! each shift is assigned to a min-to-max workers per day
-    const int min_workers = 2;
+    const int min_workers = 3;
     const int max_workers = 5;
     for (int d : all_days)
     {
@@ -124,15 +127,38 @@ void ScheduleRequestsSat()
     SatParameters parameters;
     parameters.set_linearization_level(0);
     // Enumerate all solutions.
-    parameters.set_enumerate_all_solutions(true);
+    parameters.set_enumerate_all_solutions(false);
     model.Add(NewSatParameters(parameters));
+
+    model.Add(NewFeasibleSolutionObserver([&](const CpSolverResponse& r) {
+        for (int d : all_days)
+        {
+            LOG(INFO) << "Day " << std::to_string(d);
+            for (int n : all_workers)
+            {
+                bool is_working = false;
+                for (int s : all_shifts)
+                {
+                    auto key = std::make_tuple(n, d, s);
+                    if (SolutionIntegerValue(r, shifts[key]))
+                    {
+                        is_working = true;
+                        LOG(INFO) << "  " << WORKERS.at(n).toStdString() << " works " << SHIFTS.at(s).toStdString();
+                    }
+                }
+                if (!is_working)
+                {
+                    LOG(INFO) << "  " << WORKERS.at(n).toStdString() << " does not work";
+                }
+            }
+        }
+    }));
 
     const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);
 
     // Statistics.
     LOG(INFO) << "Statistics";
     LOG(INFO) << CpSolverResponseStats(response);
-
 }
 
 void Planner::Plan(AvailabilityTableModel* availabilityModel, SkillHourTableModel* skillHourModel)
