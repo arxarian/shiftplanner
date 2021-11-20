@@ -1,0 +1,26 @@
+inspiration:
+* employee scheduling: https://developers.google.com/optimization/scheduling/employee_scheduling
+* skills + requirements: https://github.com/giangstrider/scheduling-optimization-ortools/blob/master/main.py
+
+
+* alternative: https://towardsdatascience.com/how-to-solve-a-staff-scheduling-problem-with-python-63ae50435ba4
+
+each day is divided into 2 * x shifts where shifts = covid slots + reservations slots + residences slots
+every day, each shifts 
+
+each day is divided into 6 shifts (morning, afternon; covid, reservations, residences)
+every day, each shift is assigned to min to max workers, ?no worker works more that one shift?
+the shifts are divided as equally as possible
+
+const int workersCount = 3;
+const int shiftsCount = 6;
+const int daysCount = 3;
+
+std::vector<int> all_workers(workes);
+std::iota(all_workers.begin(), all_workers.end(), 0);
+
+std::vector<int> all_shifts(num_shifts);
+std::iota(all_shifts.begin(), all_shifts.end(), 0);
+
+std::vector<int> all_days(num_days);
+std::iota(all_days.begin(), all_days.end(), 0);
