@@ -15,8 +15,8 @@ unix {
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    main.cpp \
-    mainwindow.cpp \
+    sources/main.cpp \
+    sources/mainwindow.cpp \
     sources/planner/planner.cpp \
     sources/workers/workeritem.cpp \
     sources/workers/workermodel.cpp \
@@ -30,7 +30,7 @@ SOURCES += \
     sources/shifts/shiftmodel.cpp
 
 HEADERS += \
-    mainwindow.h \
+    sources/mainwindow.h \
     sources/planner/planner.h \
     sources/workers/workeritem.h \
     sources/workers/workermodel.h \
@@ -44,7 +44,7 @@ HEADERS += \
     sources/shifts/shiftmodel.h
 
 FORMS += \
-    mainwindow.ui
+    sources/mainwindow.ui
 
 TRANSLATIONS += \
     ShiftPlanner_cs_CZ.ts
