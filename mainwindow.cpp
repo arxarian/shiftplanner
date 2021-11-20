@@ -30,6 +30,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     AddAvailability();
     AddSkillsAndHours();
+
+    m_planner->Plan(m_availabilityModel, m_skillsAndHoursModel);
 }
 
 MainWindow::~MainWindow()
@@ -41,8 +43,19 @@ void MainWindow::AddAvailability()
 {
     // model must take the ownership
 
-    const QString& text =
-      QString("\t22. 10.\t23. 10.\t24. 10.\t25. 10.\t26. 10.\nPavel\tC\tC\tR\tX\tR\nKarel\tX\tX\tC\tR/O\tO\nSimona\tX\tX\tX\tX\tR\n");
+    const QString& text = QString("\t22. 10.\t23. 10.\t24. 10.\t25. 10.\t26. 10.\n"
+                                  "Karel\tC\tC\tR\tX\tR\n"
+                                  "Marek\tX\tX\tC\tR/O\tO\n"
+                                  "Karolina\tX\tX\tX\tX\tR\n"
+                                  "Lenka\tC\tC\tR\tX\tR\n"
+                                  "Simona\tX\tX\tC\tR/O\tO\n"
+                                  "Pavel\tX\tX\tX\tX\tR\n"
+                                  "Cupito\tC\tC\tR\tX\tR\n"
+                                  "Standa\tX\tX\tC\tR/O\tO\n"
+                                  "Julie\tX\tX\tX\tX\tR\n"
+                                  "Jan\tX\tX\tX\tX\tR\n"
+                                  "Julie\tX\tX\tX\tX\tR\n"
+                                  "Jan\tX\tX\tX\tX\tR\n");
 
     //    QClipboard* clipboard = QGuiApplication::clipboard();
     //    const QString& text   = clipboard->text();
@@ -62,8 +75,19 @@ void MainWindow::AddAvailability()
 
 void MainWindow::AddSkillsAndHours()
 {
-    const QString& text = QString("\tSenior\tProject\tCovidt\tReservations\tResidences\tHours"
-                                  "\nPavel\tX\tANO\tX\tX\t\t80\nKarel\t\tNE\t\t\tX\t80\nSimona\tX\tANO\t\t\tX\t80\n");
+    const QString& text = QString("\tSenior\tProject\tCovidt\tBooking\tResidences\tHours\n"
+                                  "Karel\t\tNE\t\t\tX\t80\n"
+                                  "Marek\tX\tANO\tX\tX\t\t80\n"
+                                  "Karolina\tX\tANO\t\t\tX\t80\n"
+                                  "Lenka\tX\tANO\t\t\tX\t80\n"
+                                  "Simona\tX\tANO\t\t\tX\t80\n"
+                                  "Pavel\tX\tANO\t\t\tX\t80\n"
+                                  "Cupito\tX\tANO\t\t\tX\t80\n"
+                                  "Standa\tX\tANO\t\t\tX\t80\n"
+                                  "Julie\tX\tANO\t\t\tX\t80\n"
+                                  "Jan\tX\tANO\t\t\tX\t80\n"
+                                  "Julie\tX\tANO\t\t\tX\t80\n"
+                                  "Jan\tX\tANO\t\t\tX\t80\n");
 
     QStringList&& rows = text.split(QChar::LineFeed);
     rows.removeFirst();

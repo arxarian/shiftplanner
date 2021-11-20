@@ -18,4 +18,9 @@ public slots:
 signals:
 
 private:
+    AvailabilityTableModel* m_availabilityModel = nullptr;
+    SkillHourTableModel* m_skillHourModel       = nullptr;
+
+private:
+    void ScheduleRequestsSat();
 };

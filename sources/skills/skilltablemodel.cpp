@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QPointer>
 
-const QStringList Skills = {"Senior", "Project", "Covid", "Reservations", "Residences"};
+const QStringList Skills = {"Senior", "Project", "Covid", "Booking", "Residences"};
 
 SkillHourTableModel::SkillHourTableModel(QObject* parent) : QAbstractTableModel(parent)
 {
