@@ -1,9 +1,9 @@
 #include "skilltablemodel.h"
 
+#include "../global.h"
+
 #include <QDebug>
 #include <QPointer>
-
-const QStringList Skills = {"Senior", "Project", "Covid", "Booking", "Residences"};
 
 SkillHourTableModel::SkillHourTableModel(QObject* parent) : QAbstractTableModel(parent)
 {
@@ -21,7 +21,7 @@ int SkillHourTableModel::columnCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent)
 
-    return Skills.count() + 1;
+    return G::SkillsNames.count() + 1; // + 1 because of hours column
 }
 
 QVariant SkillHourTableModel::data(const QModelIndex& index, int role) const
@@ -34,11 +34,11 @@ QVariant SkillHourTableModel::data(const QModelIndex& index, int role) const
     if (role == Qt::DisplayRole)
     {
         const QString& worker = m_workers.at(index.row());
-        if (index.column() < Skills.count())
+        if (index.column() < G::SkillsNames.count())
         {
             return m_workersSkills.value(worker).at(index.column());
         }
-        else if (index.column() == Skills.count())
+        else if (index.column() == G::SkillsNames.count())
         {
             return m_workersHours.value(worker);
         }
@@ -53,11 +53,11 @@ QVariant SkillHourTableModel::headerData(int section, Qt::Orientation orientatio
     {
         if (orientation == Qt::Horizontal)
         {
-            if (section < Skills.count())
+            if (section < G::SkillsNames.count())
             {
-                return Skills.value(section);
+                return G::SkillsNames.value(section);
             }
-            else if (section == Skills.count())
+            else if (section == G::SkillsNames.count())
             {
                 return "Hours";
             }
@@ -109,6 +109,6 @@ void SkillHourTableModel::setWorkersSkillsAndHours(const QStringList& workersSki
     }
 
     emit headerDataChanged(Qt::Vertical, 0, m_workers.count() - 1);
-    emit dataChanged(index(0, 0), index(m_workers.count() - 1, Skills.count())); // +1 because of hours column
+    emit dataChanged(index(0, 0), index(m_workers.count() - 1, G::SkillsNames.count())); // +1 because of hours column
     emit workersChanged(m_workers);
 }

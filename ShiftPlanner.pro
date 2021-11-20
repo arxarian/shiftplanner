@@ -30,6 +30,7 @@ SOURCES += \
     sources/shifts/shiftmodel.cpp
 
 HEADERS += \
+    sources/global.h \
     sources/mainwindow.h \
     sources/planner/planner.h \
     sources/workers/workeritem.h \

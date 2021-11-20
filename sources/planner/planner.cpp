@@ -1,5 +1,7 @@
 #include "planner.h"
 
+#include "../global.h"
+
 #include <absl/strings/str_format.h>
 #include <ortools/sat/cp_model.h>
 #include <ortools/sat/model.h>
@@ -7,8 +9,6 @@
 #include <ortools/util/time_limit.h>
 
 #include <QDebug>
-
-const QStringList SHIFTS = {"Covid", "Booking", "Residences"};
 
 Planner::Planner(QObject* parent) : QObject(parent)
 {
@@ -37,7 +37,7 @@ void Planner::ScheduleRequestsSat()
     const int num_days          = 2;
     const int num_slots         = num_days * num_slots_per_day;
 
-    Q_ASSERT(SHIFTS.size() == num_shifts);
+    Q_ASSERT(G::ShiftsNames.size() == num_shifts);
 
     std::vector<int> all_workers(num_workers);
     std::iota(all_workers.begin(), all_workers.end(), 0);
@@ -150,7 +150,7 @@ void Planner::ScheduleRequestsSat()
                     if (SolutionIntegerValue(r, shifts[key]))
                     {
                         is_working = true;
-                        LOG(INFO) << "  " << workers.at(n).toStdString() << " works " << SHIFTS.at(s).toStdString();
+                        LOG(INFO) << "  " << workers.at(n).toStdString() << " works " << G::ShiftsNames.at(s).toStdString();
                     }
                 }
                 if (!is_working)
