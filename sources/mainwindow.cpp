@@ -45,17 +45,17 @@ void MainWindow::AddAvailability()
 
     const QString& text = QString("\t22. 10.\t23. 10.\t24. 10.\t25. 10.\t26. 10.\n"
                                   "Karel\tC\tC\tR\tX\tR\n"
-                                  "Marek\tX\tX\tC\tR/O\tO\n"
-                                  "Karolina\tX\tX\tX\tX\tR\n"
+                                  "Marek\tX\tC\tC\tR/O\tO\n"
+                                  "Karolina\tC\tO\tX\tR\tR\n"
                                   "Lenka\tC\tC\tR\tX\tR\n"
-                                  "Simona\tX\tX\tC\tR/O\tO\n"
-                                  "Pavel\tX\tX\tX\tX\tR\n"
+                                  "Simona\tC\tC\tC\tR/O\tO\n"
+                                  "Pavel\tR\tR\tR\tR\tR\n"
                                   "Cupito\tC\tC\tR\tX\tR\n"
-                                  "Standa\tX\tX\tC\tR/O\tO\n"
-                                  "Julie\tX\tX\tX\tX\tR\n"
-                                  "Jan\tX\tX\tX\tX\tR\n"
-                                  "Julie\tX\tX\tX\tX\tR\n"
-                                  "Jan\tX\tX\tX\tX\tR\n");
+                                  "Standa\tR/O\tR/O\tR/O\tR/O\tO\n"
+                                  "Julie\tC\tC\tC\tC\tC\n"
+                                  "Jan\tC\tO\tR\tC\tR\n"
+                                  "Julie\tC\tC\tC\tR\tC\n"
+                                  "Jan\tR/O\tR/O\tR/O\tR/O\tR\n");
 
     //    QClipboard* clipboard = QGuiApplication::clipboard();
     //    const QString& text   = clipboard->text();

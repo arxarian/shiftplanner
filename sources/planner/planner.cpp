@@ -10,6 +10,26 @@
 
 #include <QDebug>
 
+bool available(const QString& availabitilty, const bool morning)
+{
+    if (availabitilty == G::DayShift || availabitilty == G::MorningOrAfternoonShift)
+    {
+        return true;
+    }
+
+    if (availabitilty == G::MorningShift && morning)
+    {
+        return true;
+    }
+
+    if (availabitilty == G::AfternoonShift && !morning)
+    {
+        return true;
+    }
+
+    return false;
+}
+
 Planner::Planner(QObject* parent) : QObject(parent)
 {
     //
@@ -30,11 +50,13 @@ using namespace operations_research::sat;
 
 void Planner::ScheduleRequestsSat()
 {
+    const QStringList& dates = m_availabilityModel->dates();
+
     //! data definition
     const int num_workers       = m_skillHourModel->rowCount();
     const int num_shifts        = 3;
     const int num_slots_per_day = 2;
-    const int num_days          = 2;
+    const int num_days          = dates.size();
     const int num_slots         = num_days * num_slots_per_day;
 
     Q_ASSERT(G::ShiftsNames.size() == num_shifts);
@@ -70,8 +92,9 @@ void Planner::ScheduleRequestsSat()
     const std::array min_workers = {1, 1, 2}; // Covid, Booking, Residences
     const std::array max_workers = {3, 1, 5}; // Covid, Booking, Residences
 
-    const QStringList& workers                     = m_skillHourModel->workers();
-    const QMap<QString, QStringList>& workerSkills = m_skillHourModel->workersSkills();
+    const QStringList& workers                             = m_skillHourModel->workers();
+    const QMap<QString, QStringList>& workerSkills         = m_skillHourModel->workersSkills();
+    const QMap<QString, QStringList>& workersAvailabitilty = m_availabilityModel->workersAvailabitilty();
 
     for (int d : all_slots)
     {
@@ -80,12 +103,26 @@ void Planner::ScheduleRequestsSat()
             std::vector<IntVar> x;
             for (int n : all_workers)
             {
+                const QString& worker = workers.at(n);
                 // if worker does not have the skill, do not add it
-                if (!workerSkills.value(workers.at(n)).at(s + 2).isEmpty()) // the first two skills are "Senior" and "Project"
+                if (workerSkills.value(worker).at(s + 2).isEmpty()) // the first two skills are "Senior" and "Project"
                 {
-                    auto key = std::make_tuple(n, d, s);
-                    x.push_back(shifts[key]);
+                    continue;
                 }
+
+                // respect workers requirements: if worker is not available, do not add it
+                const QString& availabitilty = workersAvailabitilty.value(worker).at(d / 2);
+                const bool morning           = (d + 1) % 2;
+                if (!available(availabitilty, morning))
+                {
+                    continue;
+                }
+
+                // TODO - how to deal with only morning or only afternoon requirement
+
+                // worker has the skill and is willing to work in this slot
+                auto key = std::make_tuple(n, d, s);
+                x.push_back(shifts[key]);
             }
             cp_model.AddLessOrEqual(min_workers[s], LinearExpr::Sum(x));
             cp_model.AddLessOrEqual(LinearExpr::Sum(x), max_workers[s]);
@@ -146,9 +183,10 @@ void Planner::ScheduleRequestsSat()
 
     model.Add(NewFeasibleSolutionObserver([&](const CpSolverResponse& r) {
         const QStringList& workers = m_skillHourModel->workers();
+        const QStringList& dates   = m_availabilityModel->dates();
         for (int d : all_slots)
         {
-            LOG(INFO) << "Day " << std::to_string(d / 2) << " - " << G::PartsNames.at(d % 2).toStdString();
+            LOG(INFO) << "Day " << dates.at(d / 2).toStdString() << " - " << G::PartsNames.at(d % 2).toStdString();
             for (int n : all_workers)
             {
                 bool is_working = false;
