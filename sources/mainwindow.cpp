@@ -78,16 +78,16 @@ void MainWindow::AddSkillsAndHours()
     const QString& text = QString("\tSenior\tProject\tCovidt\tBooking\tResidences\tHours\n"
                                   "Karel\t\tNE\t\t\tX\t80\n"
                                   "Marek\tX\tANO\tX\tX\t\t80\n"
-                                  "Karolina\tX\tANO\t\t\tX\t80\n"
-                                  "Lenka\tX\tANO\t\t\tX\t80\n"
-                                  "Simona\tX\tANO\t\t\tX\t80\n"
-                                  "Pavel\tX\tANO\t\t\tX\t80\n"
-                                  "Cupito\tX\tANO\t\t\tX\t80\n"
-                                  "Standa\tX\tANO\t\t\tX\t80\n"
-                                  "Julie\tX\tANO\t\t\tX\t80\n"
-                                  "Jan\tX\tANO\t\t\tX\t80\n"
-                                  "Julie\tX\tANO\t\t\tX\t80\n"
-                                  "Jan\tX\tANO\t\t\tX\t80\n");
+                                  "Karolina\tX\tANO\tX\tX\tX\t80\n"
+                                  "Lenka\tX\tANO\t\tX\tX\t80\n"
+                                  "Simona\tX\tNE\tX\t\tX\t80\n"
+                                  "Pavel\tX\tNE\t\tX\tX\t80\n"
+                                  "Cupito\t\tANO\t\tX\tX\t80\n"
+                                  "Standa\t\tANO\t\t\tX\t80\n"
+                                  "Julie\t\tNE\tX\tX\t\t80\n"
+                                  "Jan\t\tANO\tX\tX\t\t80\n"
+                                  "Julie\t\tNE\tX\tX\t\t80\n"
+                                  "Jan\tX\tANO\tX\tX\tX\t80\n");
 
     QStringList&& rows = text.split(QChar::LineFeed);
     rows.removeFirst();

@@ -6,6 +6,7 @@ namespace G
 {
     const QStringList SkillsNames = {"Senior", "Project", "Covid", "Booking", "Residences"};
     const QStringList ShiftsNames = {"Covid", "Booking", "Residences"};
+    const QStringList PartsNames  = {"morning", "afternoon"};
 
     enum Shifts
     {
@@ -13,5 +14,4 @@ namespace G
         Booking,
         Residences
     };
-
 } // namespace G

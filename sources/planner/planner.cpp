@@ -69,6 +69,10 @@ void Planner::ScheduleRequestsSat()
     //! each shift is assigned to a min-to-max workers per day
     const std::array min_workers = {1, 1, 2}; // Covid, Booking, Residences
     const std::array max_workers = {3, 1, 5}; // Covid, Booking, Residences
+
+    const QStringList& workers                     = m_skillHourModel->workers();
+    const QMap<QString, QStringList>& workerSkills = m_skillHourModel->workersSkills();
+
     for (int d : all_slots)
     {
         for (int s : all_shifts)
@@ -76,8 +80,12 @@ void Planner::ScheduleRequestsSat()
             std::vector<IntVar> x;
             for (int n : all_workers)
             {
-                auto key = std::make_tuple(n, d, s);
-                x.push_back(shifts[key]);
+                // if worker does not have the skill, do not add it
+                if (!workerSkills.value(workers.at(n)).at(s + 2).isEmpty()) // the first two skills are "Senior" and "Project"
+                {
+                    auto key = std::make_tuple(n, d, s);
+                    x.push_back(shifts[key]);
+                }
             }
             cp_model.AddLessOrEqual(min_workers[s], LinearExpr::Sum(x));
             cp_model.AddLessOrEqual(LinearExpr::Sum(x), max_workers[s]);
@@ -140,7 +148,7 @@ void Planner::ScheduleRequestsSat()
         const QStringList& workers = m_skillHourModel->workers();
         for (int d : all_slots)
         {
-            LOG(INFO) << "Day " << std::to_string(d / 2) << " - " << ((d % 2) ? "afternoon" : "morning");
+            LOG(INFO) << "Day " << std::to_string(d / 2) << " - " << G::PartsNames.at(d % 2).toStdString();
             for (int n : all_workers)
             {
                 bool is_working = false;
@@ -153,10 +161,10 @@ void Planner::ScheduleRequestsSat()
                         LOG(INFO) << "  " << workers.at(n).toStdString() << " works " << G::ShiftsNames.at(s).toStdString();
                     }
                 }
-                if (!is_working)
-                {
-                    LOG(INFO) << "  " << workers.at(n).toStdString() << " does not work";
-                }
+                //                if (!is_working)
+                //                {
+                //                    LOG(INFO) << "  " << workers.at(n).toStdString() << " does not work";
+                //                }
             }
         }
         stopped = true;
