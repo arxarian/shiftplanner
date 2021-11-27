@@ -89,16 +89,16 @@ void Planner::ScheduleRequestsSat()
     }
 
     //! each shift is assigned to a min-to-max workers per day
-    const std::array min_workers = {1, 1, 2}; // Covid, Booking, Residences
-    const std::array max_workers = {3, 1, 5}; // Covid, Booking, Residences
+    const std::array min_workers = {2, 2, 2}; // Covid, Booking, Residences
+    const std::array max_workers = {3, 3, 5}; // Covid, Booking, Residences
 
     const QStringList& workers                             = m_skillHourModel->workers();
     const QMap<QString, QStringList>& workerSkills         = m_skillHourModel->workersSkills();
     const QMap<QString, QStringList>& workersAvailabitilty = m_availabilityModel->workersAvailabitilty();
 
-    for (int d : all_slots)
+    for (int d : all_slots) // ALL DAYS {MORNING, AFTERNOON}
     {
-        for (int s : all_shifts)
+        for (int s : all_shifts) // COVID, BOOKING, RESIDENCES
         {
             std::vector<IntVar> x;
             for (int n : all_workers)
@@ -129,7 +129,24 @@ void Planner::ScheduleRequestsSat()
         }
     }
 
-    //! each worker works at most one shift per day
+    //! workers hours fond
+    const QMap<QString, qint32>& workerHours = m_skillHourModel->workersHours();
+    for (int n : all_workers)
+    {
+        std::vector<IntVar> x;
+        const QString& worker = workers.at(n);
+        for (int s : all_shifts)
+        {
+            for (int d : all_slots)
+            {
+                auto key = std::make_tuple(n, d, s);
+                x.push_back(shifts[key]);
+            }
+        }
+        cp_model.AddLessOrEqual(LinearExpr::Sum(x), workerHours.value(worker) / 4); // each slot has four hours
+    }
+
+    //! each worker works at most one slot
     for (int n : all_workers)
     {
         for (int d : all_slots)
@@ -197,6 +214,8 @@ void Planner::ScheduleRequestsSat()
                     {
                         is_working = true;
                         LOG(INFO) << "  " << workers.at(n).toStdString() << " works " << G::ShiftsNames.at(s).toStdString();
+
+                        Q_ASSERT(!workerSkills.contains(G::ShiftsNames.at(s)));
                     }
                 }
                 //                if (!is_working)

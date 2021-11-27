@@ -44,7 +44,7 @@ void MainWindow::AddAvailability()
     // model must take the ownership
 
     const QString& text = QString("\t22. 10.\t23. 10.\t24. 10.\t25. 10.\t26. 10.\n"
-                                  "Karel\tC\tC\tR\tX\tR\n"
+                                  "Karel\tR/O\tR/O\tR/O\tR/O\tR/O\n"
                                   "Marek\tX\tC\tC\tR/O\tO\n"
                                   "Karolina\tC\tO\tX\tR\tR\n"
                                   "Lenka\tC\tC\tR\tX\tR\n"
@@ -82,7 +82,7 @@ void MainWindow::AddSkillsAndHours()
                                   "Lenka\tX\tANO\t\tX\tX\t80\n"
                                   "Simona\tX\tNE\tX\t\tX\t80\n"
                                   "Pavel\tX\tNE\t\tX\tX\t80\n"
-                                  "Cupito\t\tANO\t\tX\tX\t80\n"
+                                  "Cupito\t\tANO\t\tX\tX\t4\n"
                                   "Standa\t\tANO\t\t\tX\t80\n"
                                   "Julie\t\tNE\tX\tX\t\t80\n"
                                   "Jan\t\tANO\tX\tX\t\t80\n"
