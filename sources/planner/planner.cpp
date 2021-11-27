@@ -88,7 +88,7 @@ void Planner::ScheduleRequestsSat()
         }
     }
 
-    //! each shift is assigned to a min-to-max workers per day
+    //! each shift is assigned to a min-to-max workers per day, set 0 workers on Friday afternoon
     const std::array min_workers = {2, 1, 2}; // Covid, Booking, Residences
     const std::array max_workers = {3, 3, 5}; // Covid, Booking, Residences
 
@@ -113,7 +113,22 @@ void Planner::ScheduleRequestsSat()
                 auto key = std::make_tuple(n, d, s);
                 x.push_back(shifts[key]);
             }
-            cp_model.AddLessOrEqual(min_workers[s], LinearExpr::Sum(x));
+
+            // make Fridays only mornings
+            const QDate date = QDate::fromString(QString("%1 %2").arg(dates.at(d / 2)).arg(QDate::currentDate().year()), "d. M. yyyy");
+
+            Q_ASSERT(date.isValid());
+
+            const bool afternoon = d % 2;
+            if (date.dayOfWeek() == G::Friday && afternoon)
+            {
+                cp_model.AddLessOrEqual(0, LinearExpr::Sum(x));
+            }
+            else
+            {
+                cp_model.AddLessOrEqual(min_workers[s], LinearExpr::Sum(x));
+            }
+
             cp_model.AddLessOrEqual(LinearExpr::Sum(x), max_workers[s]);
         }
     }

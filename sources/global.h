@@ -20,4 +20,6 @@ namespace G
         Booking,
         Residences
     };
+
+    const qint32 Friday = 5;
 } // namespace G
