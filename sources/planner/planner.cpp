@@ -89,12 +89,11 @@ void Planner::ScheduleRequestsSat()
     }
 
     //! each shift is assigned to a min-to-max workers per day
-    const std::array min_workers = {2, 2, 2}; // Covid, Booking, Residences
+    const std::array min_workers = {2, 1, 2}; // Covid, Booking, Residences
     const std::array max_workers = {3, 3, 5}; // Covid, Booking, Residences
 
-    const QStringList& workers                             = m_skillHourModel->workers();
-    const QMap<QString, QStringList>& workerSkills         = m_skillHourModel->workersSkills();
-    const QMap<QString, QStringList>& workersAvailabitilty = m_availabilityModel->workersAvailabitilty();
+    const QStringList& workers                     = m_skillHourModel->workers();
+    const QMap<QString, QStringList>& workerSkills = m_skillHourModel->workersSkills();
 
     for (int d : all_slots) // ALL DAYS {MORNING, AFTERNOON}
     {
@@ -109,16 +108,6 @@ void Planner::ScheduleRequestsSat()
                 {
                     continue;
                 }
-
-                // respect workers requirements: if worker is not available, do not add it
-                const QString& availabitilty = workersAvailabitilty.value(worker).at(d / 2);
-                const bool morning           = (d + 1) % 2;
-                if (!available(availabitilty, morning))
-                {
-                    continue;
-                }
-
-                // TODO - how to deal with only morning or only afternoon requirement
 
                 // worker has the skill and is willing to work in this slot
                 auto key = std::make_tuple(n, d, s);
@@ -146,9 +135,11 @@ void Planner::ScheduleRequestsSat()
         cp_model.AddLessOrEqual(LinearExpr::Sum(x), workerHours.value(worker) / 4); // each slot has four hours
     }
 
-    //! each worker works at most one slot
+    //! each worker works at most one slot according to his/her requirements
+    const QMap<QString, QStringList>& workersAvailabitilty = m_availabilityModel->workersAvailabitilty();
     for (int n : all_workers)
     {
+        const QStringList& availabitilties = workersAvailabitilty.value(workers.at(n));
         for (int d : all_slots)
         {
             std::vector<IntVar> x;
@@ -157,7 +148,27 @@ void Planner::ScheduleRequestsSat()
                 auto key = std::make_tuple(n, d, s);
                 x.push_back(shifts[key]);
             }
-            cp_model.AddLessOrEqual(LinearExpr::Sum(x), 1);
+
+            const QString& availabitilty = availabitilties.at(d / 2);
+            const bool morning           = (d + 1) % 2;
+            // respect workers requirements: if worker is not available, do not add it, otherwise he can work only one slot
+            cp_model.AddLessOrEqual(LinearExpr::Sum(x), available(availabitilty, morning));
+
+            if (morning && availabitilty == G::MorningOrAfternoonShift)
+            {
+                std::vector<IntVar> y;
+                for (int s : all_shifts)
+                {
+                    auto key = std::make_tuple(n, d, s);
+                    y.push_back(shifts[key]);
+                }
+                for (int s : all_shifts)
+                {
+                    auto key = std::make_tuple(n, d + 1, s);
+                    y.push_back(shifts[key]);
+                }
+                cp_model.AddLessOrEqual(LinearExpr::Sum(y), 1);
+            }
         }
     }
 
