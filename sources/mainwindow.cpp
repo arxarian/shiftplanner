@@ -55,7 +55,9 @@ void MainWindow::AddAvailability()
                                   "Julie\tC\tC\tC\tC\tC\n"
                                   "Jan\tC\tO\tR\tC\tR\n"
                                   "Lenka\tC\tC\tC\tR\tC\n"
-                                  "Jan\tR/O\tR/O\tR/O\tR/O\tR\n");
+                                  "Jan\tR/O\tR/O\tR/O\tR/O\tR\n"
+                                  "Superman\tC\tC\tC\tC\tC\n"
+                                  "Lois\tC\tC\tC\tC\tC\n");
 
     //    QClipboard* clipboard = QGuiApplication::clipboard();
     //    const QString& text   = clipboard->text();
@@ -82,12 +84,14 @@ void MainWindow::AddSkillsAndHours()
                                   "Lenka\tX\tANO\t\tX\tX\t80\n"
                                   "Simona\tX\tNE\tX\t\tX\t80\n"
                                   "Pavel\tX\tNE\t\tX\tX\t80\n"
-                                  "Cupito\tX\tANO\t\tX\tX\t4\n"
+                                  "Cupito\tX\tANO\t\tX\tX\t20\n"
                                   "Standa\t\tANO\t\t\tX\t80\n"
                                   "Julie\tX\tNE\tX\tX\t\t80\n"
                                   "Jan\tX\tANO\tX\tX\t\t80\n"
                                   "Lenka\tX\tNE\tX\tX\t\t80\n"
-                                  "Jan\t\tANO\tX\tX\tX\t80\n");
+                                  "Jan\t\tANO\tX\tX\tX\t80\n"
+                                  "Superman\tX\tANO\tX\tX\tX\t80\n"
+                                  "Lois\tX\tNE\tX\tX\tX\t80\n");
 
     QStringList&& rows = text.split(QChar::LineFeed);
     rows.removeFirst();

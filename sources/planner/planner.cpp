@@ -133,25 +133,37 @@ void Planner::ScheduleRequestsSat()
         }
     }
 
-    //! each slot need to have at least one senior worker
-    //! https://stackoverflow.com/questions/63961719/google-or-tools-find-best-group-assignments ?
+    //! each slot need to have at least one senior worker, one project worker and one non-project worker
     for (int d : all_slots)
     {
         for (int s : all_shifts)
         {
-            std::vector<IntVar> x;
+            std::vector<IntVar> seniors;
+            std::vector<IntVar> projects;
+            std::vector<IntVar> nonProjects;
             for (int n : all_workers)
             {
                 const QString& worker     = workers.at(n);
                 const QStringList& skills = workerSkills.value(worker);
 
-                if (!skills.first().isEmpty()) // the first skill is the senior skill
+                auto shiftKey = std::make_tuple(n, d, s);
+                if (G::isSenior(skills))
                 {
-                    auto shiftKey = std::make_tuple(n, d, s);
-                    x.push_back(shifts[shiftKey]);
+                    seniors.push_back(shifts[shiftKey]);
+                }
+
+                if (G::isProject(skills))
+                {
+                    projects.push_back(shifts[shiftKey]);
+                }
+                else
+                {
+                    nonProjects.push_back(shifts[shiftKey]);
                 }
             }
-            cp_model.AddGreaterOrEqual(LinearExpr::Sum(x), 1); // is there at least one senior
+            cp_model.AddGreaterOrEqual(LinearExpr::Sum(seniors), 1);     // is there at least one senior worker
+            cp_model.AddGreaterOrEqual(LinearExpr::Sum(projects), 1);    // is there at least one project worker
+            cp_model.AddGreaterOrEqual(LinearExpr::Sum(nonProjects), 1); // is there at least one non project worker
         }
     }
 

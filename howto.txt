@@ -7,6 +7,9 @@ inspiration:
 FAQ
 * https://stackoverflow.com/questions/47312013/google-or-tools-employee-scheduling-with-availability-constraint
 
+Skills
+* https://stackoverflow.com/questions/63961719/google-or-tools-find-best-group-assignments
+
 each day is divided into 2 * x shifts where shifts = covid slots + reservations slots + residences slots
 every day, each shifts 
 
