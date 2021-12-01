@@ -133,6 +133,28 @@ void Planner::ScheduleRequestsSat()
         }
     }
 
+    //! each slot need to have at least one senior worker
+    //! https://stackoverflow.com/questions/63961719/google-or-tools-find-best-group-assignments ?
+    for (int d : all_slots)
+    {
+        for (int s : all_shifts)
+        {
+            std::vector<IntVar> x;
+            for (int n : all_workers)
+            {
+                const QString& worker     = workers.at(n);
+                const QStringList& skills = workerSkills.value(worker);
+
+                if (!skills.first().isEmpty()) // the first skill is the senior skill
+                {
+                    auto shiftKey = std::make_tuple(n, d, s);
+                    x.push_back(shifts[shiftKey]);
+                }
+            }
+            cp_model.AddGreaterOrEqual(LinearExpr::Sum(x), 1); // is there at least one senior
+        }
+    }
+
     //! workers hours fond
     const QMap<QString, qint32>& workerHours = m_skillHourModel->workersHours();
     for (int n : all_workers)
@@ -225,8 +247,9 @@ void Planner::ScheduleRequestsSat()
     //    model.GetOrCreate<operations_research::TimeLimit>()->RegisterExternalBooleanAsLimit(&stopped);
 
     model.Add(NewFeasibleSolutionObserver([&](const CpSolverResponse& r) {
-        const QStringList& workers = m_skillHourModel->workers();
-        const QStringList& dates   = m_availabilityModel->dates();
+        const QMap<QString, QStringList>& skills = m_skillHourModel->workersSkills();
+        const QStringList& workers               = m_skillHourModel->workers();
+        const QStringList& dates                 = m_availabilityModel->dates();
         for (int d : all_slots)
         {
             LOG(INFO) << "Day " << dates.at(d / 2).toStdString() << " - " << G::PartsNames.at(d % 2).toStdString();
@@ -239,7 +262,14 @@ void Planner::ScheduleRequestsSat()
                     if (SolutionIntegerValue(r, shifts[key]))
                     {
                         is_working = true;
-                        LOG(INFO) << "  " << workers.at(n).toStdString() << " works " << G::ShiftsNames.at(s).toStdString();
+                        if (skills.value(workers.at(n)).first().isEmpty())
+                        {
+                            LOG(INFO) << "  " << workers.at(n).toStdString() << " works " << G::ShiftsNames.at(s).toStdString();
+                        }
+                        else
+                        {
+                            LOG(INFO) << "  " << workers.at(n).toStdString() << " [S] works " << G::ShiftsNames.at(s).toStdString();
+                        }
 
                         Q_ASSERT(!workerSkills.contains(G::ShiftsNames.at(s)));
                     }
