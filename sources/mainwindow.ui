@@ -20,7 +20,7 @@
       <item>
        <widget class="QToolButton" name="toolButtonWorkersFrame">
         <property name="text">
-         <string>Operators</string>
+         <string>Workers</string>
         </property>
        </widget>
       </item>
