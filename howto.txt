@@ -2,8 +2,10 @@ inspiration:
 * employee scheduling: https://developers.google.com/optimization/scheduling/employee_scheduling
 * skills + requirements: https://github.com/giangstrider/scheduling-optimization-ortools/blob/master/main.py
 
-
 * alternative: https://towardsdatascience.com/how-to-solve-a-staff-scheduling-problem-with-python-63ae50435ba4
+
+FAQ
+* https://stackoverflow.com/questions/47312013/google-or-tools-employee-scheduling-with-availability-constraint
 
 each day is divided into 2 * x shifts where shifts = covid slots + reservations slots + residences slots
 every day, each shifts 

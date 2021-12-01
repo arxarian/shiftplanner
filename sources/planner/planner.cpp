@@ -109,20 +109,20 @@ void Planner::ScheduleRequestsSat()
                     continue;
                 }
 
-                // worker has the skill and is willing to work in this slot
+                // worker has the skill
                 auto key = std::make_tuple(n, d, s);
                 x.push_back(shifts[key]);
             }
 
             // make Fridays only mornings
-            const QDate date = QDate::fromString(QString("%1 %2").arg(dates.at(d / 2)).arg(QDate::currentDate().year()), "d. M. yyyy");
+            const QDate& date = QDate::fromString(QString("%1 %2").arg(dates.at(d / 2)).arg(QDate::currentDate().year()), "d. M. yyyy");
 
             Q_ASSERT(date.isValid());
 
             const bool afternoon = d % 2;
             if (date.dayOfWeek() == G::Friday && afternoon)
             {
-                cp_model.AddLessOrEqual(0, LinearExpr::Sum(x));
+                cp_model.AddLessOrEqual(0, LinearExpr::Sum(x)); // zero workers on Friday afternoon
             }
             else
             {
@@ -138,7 +138,6 @@ void Planner::ScheduleRequestsSat()
     for (int n : all_workers)
     {
         std::vector<IntVar> x;
-        const QString& worker = workers.at(n);
         for (int s : all_shifts)
         {
             for (int d : all_slots)
@@ -147,6 +146,7 @@ void Planner::ScheduleRequestsSat()
                 x.push_back(shifts[key]);
             }
         }
+        const QString& worker = workers.at(n);
         cp_model.AddLessOrEqual(LinearExpr::Sum(x), workerHours.value(worker) / 4); // each slot has four hours
     }
 
