@@ -54,8 +54,8 @@ void Planner::ScheduleRequestsSat()
 
     //! data definition
     const int num_workers       = m_skillHourModel->rowCount();
-    const int num_shifts        = 3;
-    const int num_slots_per_day = 2;
+    const int num_shifts        = G::Shifts;
+    const int num_slots_per_day = G::SlotsPerDay;
     const int num_days          = dates.size();
     const int num_slots         = num_days * num_slots_per_day;
 
@@ -198,8 +198,8 @@ void Planner::ScheduleRequestsSat()
                 x.push_back(shifts[key]);
             }
 
-            const QString& availabitilty = availabitilties.at(d / 2);
-            const bool morning           = (d + 1) % 2;
+            const QString& availabitilty = availabitilties.at(d / G::SlotsPerDay);
+            const bool morning           = (d + 1) % G::SlotsPerDay;
             // respect workers requirements: if worker is not available, do not add it, otherwise he can work only one slot
             cp_model.AddLessOrEqual(LinearExpr::Sum(x), available(availabitilty, morning));
 
@@ -262,18 +262,20 @@ void Planner::ScheduleRequestsSat()
         const QMap<QString, QStringList>& skills = m_skillHourModel->workersSkills();
         const QStringList& workers               = m_skillHourModel->workers();
         const QStringList& dates                 = m_availabilityModel->dates();
+
+        m_schedule.clear();
+        m_schedule.resize(num_slots);
+
         for (int d : all_slots)
         {
-            LOG(INFO) << "Day " << dates.at(d / 2).toStdString() << " - " << G::PartsNames.at(d % 2).toStdString();
+            LOG(INFO) << "Day " << dates.at(d / G::SlotsPerDay).toStdString() << " - " << G::PartsNames.at(d % G::SlotsPerDay).toStdString();
             for (int n : all_workers)
             {
-                bool is_working = false;
                 for (int s : all_shifts)
                 {
                     auto key = std::make_tuple(n, d, s);
                     if (SolutionIntegerValue(r, shifts[key]))
                     {
-                        is_working = true;
                         if (skills.value(workers.at(n)).first().isEmpty())
                         {
                             LOG(INFO) << "  " << workers.at(n).toStdString() << " works " << G::ShiftsNames.at(s).toStdString();
@@ -283,13 +285,12 @@ void Planner::ScheduleRequestsSat()
                             LOG(INFO) << "  " << workers.at(n).toStdString() << " [S] works " << G::ShiftsNames.at(s).toStdString();
                         }
 
+                        m_schedule[d][s].push_back(n);
+
+
                         Q_ASSERT(!workerSkills.contains(G::ShiftsNames.at(s)));
                     }
                 }
-                //                if (!is_working)
-                //                {
-                //                    LOG(INFO) << "  " << workers.at(n).toStdString() << " does not work";
-                //                }
             }
         }
         stopped = true;
@@ -314,4 +315,6 @@ void Planner::Plan(AvailabilityTableModel* availabilityModel, SkillHourTableMode
     ScheduleRequestsSat();
 
     qDebug() << "got it";
+
+    emit Planned(m_schedule);
 }

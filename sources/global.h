@@ -4,6 +4,9 @@
 
 namespace G
 {
+    const qint32 Shifts      = 3;
+    const qint32 SlotsPerDay = 2;
+
     const QStringList SkillsNames = {"Senior", "Project", "Covid", "Booking", "Residences"};
     const QStringList ShiftsNames = {"Covid", "Booking", "Residences"};
     const QStringList ShiftsDays  = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
