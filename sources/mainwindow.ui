@@ -22,12 +22,30 @@
         <property name="text">
          <string>Workers</string>
         </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
+        </property>
+        <property name="autoRaise">
+         <bool>false</bool>
+        </property>
        </widget>
       </item>
       <item>
        <widget class="QToolButton" name="toolButtonAvailabilityFrame">
         <property name="text">
          <string>Availability</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -36,12 +54,24 @@
         <property name="text">
          <string>Shifts</string>
         </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
        <widget class="QToolButton" name="toolButtonScheduleFrame">
         <property name="text">
          <string>Schedule</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -139,7 +169,7 @@
          </layout>
         </item>
         <item row="1" column="0">
-         <widget class="QTableView" name="tableViewShifts"/>
+         <widget class="QTableView" name="tableViewSchedule"/>
         </item>
        </layout>
       </widget>

@@ -4,7 +4,7 @@
 
 namespace G
 {
-    const qint32 Shifts      = 3;
+    const qint32 ShiftsCount = 3;
     const qint32 SlotsPerDay = 2;
 
     const QStringList SkillsNames = {"Senior", "Project", "Covid", "Booking", "Residences"};
@@ -21,11 +21,11 @@ namespace G
     const QLatin1String Yes("ANO");
     const QLatin1String No("NE");
 
-    enum Shifts
+    enum ShiftTypes
     {
-        Covid = 0,
+        Residences = 0,
         Booking,
-        Residences
+        Covid
     };
 
     const qint32 Friday = 5;

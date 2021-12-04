@@ -3,6 +3,7 @@
 
 #include "sources/availability/availabilitytablemodel.h"
 #include "sources/planner/planner.h"
+#include "sources/schedule/scheduletablemodel.h"
 #include "sources/skills/skilltablemodel.h"
 
 #include <QMainWindow>
@@ -32,6 +33,7 @@ private:
 
     AvailabilityTableModel* m_availabilityModel = nullptr;
     SkillHourTableModel* m_skillsAndHoursModel  = nullptr;
+    ScheduleTableModel* m_scheduleTableModel    = nullptr;
     Planner* m_planner                          = nullptr;
 
     //    QMap<QString, QStringList> m_workersAvailabitilty;

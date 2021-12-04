@@ -54,7 +54,7 @@ void Planner::ScheduleRequestsSat()
 
     //! data definition
     const int num_workers       = m_skillHourModel->rowCount();
-    const int num_shifts        = G::Shifts;
+    const int num_shifts        = G::ShiftsCount;
     const int num_slots_per_day = G::SlotsPerDay;
     const int num_days          = dates.size();
     const int num_slots         = num_days * num_slots_per_day;
@@ -89,15 +89,15 @@ void Planner::ScheduleRequestsSat()
     }
 
     //! each shift is assigned to a min-to-max workers per day, set 0 workers on Friday afternoon
-    const std::array min_workers = {2, 1, 2}; // Covid, Booking, Residences
-    const std::array max_workers = {3, 3, 5}; // Covid, Booking, Residences
+    const std::array min_workers = {2, 1, 2}; // Residences, Booking, Covid
+    const std::array max_workers = {3, 3, 5}; // Residences, Booking, Covid
 
     const QStringList& workers                     = m_skillHourModel->workers();
     const QMap<QString, QStringList>& workerSkills = m_skillHourModel->workersSkills();
 
     for (int d : all_slots) // ALL DAYS {MORNING, AFTERNOON}
     {
-        for (int s : all_shifts) // COVID, BOOKING, RESIDENCES
+        for (int s : all_shifts) // Residences, Booking, Covid
         {
             std::vector<IntVar> x;
             for (int n : all_workers)
@@ -263,8 +263,11 @@ void Planner::ScheduleRequestsSat()
         const QStringList& workers               = m_skillHourModel->workers();
         const QStringList& dates                 = m_availabilityModel->dates();
 
-        m_schedule.clear();
-        m_schedule.resize(num_slots);
+        for (qint32 i = 0; i < G::ShiftsCount; ++i)
+        {
+            m_schedule[i].clear();
+            m_schedule[i].resize(num_slots);
+        }
 
         for (int d : all_slots)
         {
@@ -285,7 +288,7 @@ void Planner::ScheduleRequestsSat()
                             LOG(INFO) << "  " << workers.at(n).toStdString() << " [S] works " << G::ShiftsNames.at(s).toStdString();
                         }
 
-                        m_schedule[d][s].push_back(n);
+                        m_schedule[s][d].push_back(n);
 
 
                         Q_ASSERT(!workerSkills.contains(G::ShiftsNames.at(s)));

@@ -15,7 +15,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     m_planner             = new Planner(this);
     m_availabilityModel   = new AvailabilityTableModel(this);
+    m_scheduleTableModel  = new ScheduleTableModel(this);
     m_skillsAndHoursModel = new SkillHourTableModel(this);
+
+    connect(m_planner, &Planner::Planned, m_scheduleTableModel, &ScheduleTableModel::setSchedule);
 
     connect(ui->toolButtonAvailabilityFrame, &QToolButton::clicked, this, [this] { ui->stackedWidget->setCurrentIndex(0); });
     connect(ui->toolButtonWorkersFrame, &QToolButton::clicked, this, [this] { ui->stackedWidget->setCurrentIndex(1); });
@@ -28,9 +31,15 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->tableViewAvailability->setModel(m_availabilityModel);
     ui->tableViewSkills->setModel(m_skillsAndHoursModel);
+    ui->tableViewSchedule->setModel(m_scheduleTableModel);
+
+    ui->toolButtonScheduleFrame->click();
 
     AddAvailability();
     AddSkillsAndHours();
+
+    m_scheduleTableModel->setWorkers(m_availabilityModel->workers());
+    m_scheduleTableModel->setDates(m_availabilityModel->dates());
 
     m_planner->Plan(m_availabilityModel, m_skillsAndHoursModel);
 }
@@ -78,7 +87,7 @@ void MainWindow::AddAvailability()
 
 void MainWindow::AddSkillsAndHours()
 {
-    const QString& text = QString("\tSenior\tProject\tCovidt\tBooking\tResidences\tHours\n"
+    const QString& text = QString("\tSenior\tProject\tResidencest\tBooking\tCovid\tHours\n"
                                   "Karel\tX\tNE\t\t\tX\t80\n"
                                   "Marek\t\tANO\tX\tX\t\t80\n"
                                   "Karolina\t\tANO\tX\tX\tX\t80\n"

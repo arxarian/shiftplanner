@@ -18,13 +18,13 @@ public slots:
     void Plan(AvailabilityTableModel* availabilityModel, SkillHourTableModel* skillHourModel);
 
 signals:
-    void Planned(std::vector<std::array<std::vector<int>, G::Shifts>> schedule);
+    void Planned(std::array<std::vector<std::vector<int>>, G::ShiftsCount> schedule);
 
 private:
     AvailabilityTableModel* m_availabilityModel = nullptr;
     SkillHourTableModel* m_skillHourModel       = nullptr;
 
-    std::vector<std::array<std::vector<int>, G::Shifts>> m_schedule; // slots, shifts, workers
+    std::array<std::vector<std::vector<int>>, G::ShiftsCount> m_schedule; // shifts, slots, workers
 
 private:
     void ScheduleRequestsSat();
