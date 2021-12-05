@@ -27,7 +27,8 @@ signals:
 private:
     std::array<std::vector<std::vector<int>>, G::ShiftsCount> m_schedule;
     QVector<qint32> m_workersCount;
-    QStringList m_workers;
+    QVector<QList<qint32>> m_workersIdsPerShift;
+    QStringList m_workersNames;
     QStringList m_dates;
     qint32 m_rows    = 0;
     qint32 m_columns = 0;

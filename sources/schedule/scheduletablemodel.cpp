@@ -3,6 +3,7 @@
 #include "../global.h"
 
 #include <QDebug>
+#include <QFont>
 #include <QPointer>
 
 ScheduleTableModel::ScheduleTableModel(QObject* parent) : QAbstractTableModel(parent)
@@ -33,30 +34,77 @@ QVariant ScheduleTableModel::data(const QModelIndex& index, int role) const
 
     if (role == Qt::DisplayRole)
     {
-        if (index.column() == 0)
+        qint32 shift = 0;
+        qint32 row   = index.row();
+
+        for (; shift < G::ShiftsCount; ++shift)
         {
-            return "name";
+            if (row - m_workersCount[shift] > 0)
+            {
+                row = row - m_workersCount[shift] - 1;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        bool description = false;
+        if (row == 0)
+        {
+            description = true;
+        }
+
+        --row;
+
+        if (index.column() == 0 && description)
+        {
+            // shifts names
+            return G::ShiftsNames.at(shift);
+        }
+        else if (index.column() > 0 && description)
+        {
+            // dates
+            return m_dates.at(index.column() - 1);
+        }
+        else if (index.column() == 0)
+        {
+            // workers names
+            return m_workersNames.at(m_workersIdsPerShift.at(shift).at(row));
         }
         else
         {
-            const qint32 slot = (index.column() - 1) * 2;
-            qDebug() << "*** slot" << slot;
-        }
-        // slots / shifts / names
+            // shifts
+            // shifts / slots / names
 
-        //        if (index.column() == 0)
-        //        {
-        //            return 0;
-        //        }
-        //        else if (index.row() == 0)
-        //        {
-        //            return m_dates.at(index.column() - 1);
-        //        }
-        //        else
-        //        {
-        //            return 5;
-        //        }
+            const qint32 workerId                      = m_workersIdsPerShift.at(shift).at(row);
+            const std::vector<std::vector<int>> _slots = m_schedule.at(shift);
+
+            const qint32 slot = (index.column() - 1) * 2;
+
+            const bool morning  = std::find(_slots.at(slot).begin(), _slots.at(slot).end(), workerId) != _slots.at(slot).end();
+            const bool afternon = std::find(_slots.at(slot + 1).begin(), _slots.at(slot + 1).end(), workerId) != _slots.at(slot + 1).end();
+
+            if (morning && afternon)
+            {
+                return G::DayShift;
+            }
+            else if (morning)
+            {
+                return G::MorningShift;
+            }
+            else if (afternon)
+            {
+                return G::AfternoonShift;
+            }
+        }
     }
+    //    else if (role == Qt::FontRole && index.column() == 0)
+    //    { // First column items are bold.
+    //        QFont font;
+    //        font.setBold(true);
+    //        return font;
+    //    }
 
     return QVariant();
 }
@@ -79,16 +127,15 @@ void ScheduleTableModel::setDates(const QStringList& dates)
 
 void ScheduleTableModel::setWorkers(const QStringList& workers)
 {
-    m_workers = workers;
+    m_workersNames = workers;
 }
 
 void ScheduleTableModel::setSchedule(std::array<std::vector<std::vector<int>>, G::ShiftsCount> schedule)
 {
-    // slots / shifts / names
+    // shifts / slots / names
     m_schedule = schedule;
-
-    QVector<QSet<qint32>> workers;
-    workers.resize(3);
+    QVector<QSet<qint32>> workersIdsPerShift;
+    workersIdsPerShift.resize(G::ShiftsCount);
 
     // count workers per shift at total
     for (qint32 i = 0; i < G::ShiftsCount; ++i)
@@ -97,14 +144,17 @@ void ScheduleTableModel::setSchedule(std::array<std::vector<std::vector<int>>, G
         {
             for (const auto& worker : slot)
             {
-                workers[i].insert(worker);
+                workersIdsPerShift[i].insert(worker);
             }
         }
     }
 
+    m_workersIdsPerShift.clear();
+    m_workersIdsPerShift.resize(G::ShiftsCount);
     for (qint32 i = 0; i < G::ShiftsCount; ++i)
     {
-        m_workersCount[i] = workers.at(i).count();
+        m_workersCount[i] = workersIdsPerShift.at(i).count();
+        m_workersIdsPerShift[i].append(workersIdsPerShift.at(i).values());
     }
 
     m_rows    = std::accumulate(m_workersCount.begin(), m_workersCount.end(), 0) + 3; // [booking, names, residences, names, covid, names]
