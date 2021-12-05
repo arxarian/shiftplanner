@@ -248,17 +248,10 @@ void Planner::ScheduleRequestsSat()
     //        cp_model.AddLessOrEqual(LinearExpr::Sum(num_shifts_worked), max_shifts_per_nurse);
     //    }
 
-    Model model;
-    SatParameters parameters;
-    parameters.set_linearization_level(0);
-    // Enumerate all solutions.
-    parameters.set_enumerate_all_solutions(false);
-    model.Add(NewSatParameters(parameters));
+    const CpSolverResponse response = Solve(cp_model.Build());
 
-    std::atomic<bool> stopped(false);
-    //    model.GetOrCreate<operations_research::TimeLimit>()->RegisterExternalBooleanAsLimit(&stopped);
-
-    model.Add(NewFeasibleSolutionObserver([&](const CpSolverResponse& r) {
+    if (response.status() == CpSolverStatus::OPTIMAL || response.status() == CpSolverStatus::FEASIBLE)
+    {
         const QMap<QString, QStringList>& skills = m_skillHourModel->workersSkills();
         const QStringList& workers               = m_skillHourModel->workers();
         const QStringList& dates                 = m_availabilityModel->dates();
@@ -277,7 +270,7 @@ void Planner::ScheduleRequestsSat()
                 for (int s : all_shifts)
                 {
                     auto key = std::make_tuple(n, d, s);
-                    if (SolutionIntegerValue(r, shifts[key]))
+                    if (SolutionIntegerValue(response, shifts[key]))
                     {
                         if (skills.value(workers.at(n)).first().isEmpty())
                         {
@@ -296,10 +289,7 @@ void Planner::ScheduleRequestsSat()
                 }
             }
         }
-        stopped = true;
-    }));
-
-    const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);
+    }
 
     // Statistics.
     LOG(INFO) << "Statistics";
