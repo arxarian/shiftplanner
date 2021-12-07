@@ -117,6 +117,7 @@ QVariant ScheduleTableModel::headerData(int section, Qt::Orientation orientation
     {
         return section;
     }
+
     return QVariant();
 }
 

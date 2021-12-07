@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     m_availabilityModel   = new AvailabilityTableModel(this);
     m_scheduleTableModel  = new ScheduleTableModel(this);
     m_skillsAndHoursModel = new SkillHourTableModel(this);
+    m_shiftsTableModel    = new ShiftsTableModel(this);
 
     connect(m_planner, &Planner::Planned, m_scheduleTableModel, &ScheduleTableModel::setSchedule);
 
@@ -31,12 +32,18 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->tableViewAvailability->setModel(m_availabilityModel);
     ui->tableViewSkills->setModel(m_skillsAndHoursModel);
+    ui->tableViewRegularShifts->setModel(m_shiftsTableModel);
     ui->tableViewSchedule->setModel(m_scheduleTableModel);
 
     ui->toolButtonScheduleFrame->click();
 
+    const QDate& date = QDate::currentDate();
+    ui->dateEditFrom->setDate(date.addDays(-date.day() + 1));
+    ui->dateEditTo->setDate(date.addDays(-date.day() + date.daysInMonth()));
+
     AddAvailability();
     AddSkillsAndHours();
+    AddShifts();
 
     m_scheduleTableModel->setWorkers(m_availabilityModel->workers());
     m_scheduleTableModel->setDates(m_availabilityModel->dates());
@@ -109,6 +116,17 @@ void MainWindow::AddSkillsAndHours()
     m_skillsAndHoursModel->setWorkersSkillsAndHours(rows);
 
     //        ui->tableViewSkills->resizeColumnsToContents();
+}
+
+void MainWindow::AddShifts()
+{
+    const QString& text = QString("Monday\t15\t15\t15\t9\t11\t11\t2\t2\t2\n"
+                                  "Tuesday\t15\t15\t16\t8\t9\t9\t2\t2\t3\n"
+                                  "Wednesday\t15\t15\t16\t8\t9\t9\t2\t2\t3\n"
+                                  "Thursday\t12\t12\t12\t7\t7\t8\t1\t1\t2\n"
+                                  "Friday\t11\t11\t11\t6\t6\t7\t1\t1\t2\n");
+
+    m_shiftsTableModel->setShifts(text);
 }
 
 void MainWindow::Plan()

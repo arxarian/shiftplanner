@@ -27,6 +27,7 @@ SOURCES += \
     sources/availability/availabilitymodel.cpp \
     sources/availability/availabilitytablemodel.cpp \
     sources/schedule/scheduletablemodel.cpp \
+    sources/shifts/shiftstablemodel.cpp \
     sources/shifts/shiftitem.cpp \
     sources/shifts/shiftmodel.cpp
 
@@ -43,6 +44,7 @@ HEADERS += \
     sources/availability/availabilitymodel.h \
     sources/availability/availabilitytablemodel.h \
     sources/schedule/scheduletablemodel.h \
+    sources/shifts/shiftstablemodel.h \
     sources/shifts/shiftitem.h \
     sources/shifts/shiftmodel.h
 

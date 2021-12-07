@@ -4,13 +4,15 @@
 
 namespace G
 {
+    const qint32 DaysPerWeek = 5;
     const qint32 ShiftsCount = 3;
     const qint32 SlotsPerDay = 2;
 
-    const QStringList SkillsNames = {"Senior", "Project", "Covid", "Booking", "Residences"};
-    const QStringList ShiftsNames = {"Covid", "Booking", "Residences"};
-    const QStringList ShiftsDays  = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
-    const QStringList PartsNames  = {"morning", "afternoon"};
+    const QStringList SkillsNames  = {"Senior", "Project", "Covid", "Booking", "Residences"};
+    const QStringList ShiftsNames  = {"Covid", "Booking", "Residences"};
+    const QStringList ShiftsDays   = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
+    const QStringList PartsNames   = {"morning", "afternoon"};
+    const QStringList ShiftsLimits = {"Minimal", "Optimal", "Maximal"};
 
     const QLatin1String DayShift("C");
     const QLatin1String MorningShift("R");

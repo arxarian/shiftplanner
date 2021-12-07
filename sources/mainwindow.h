@@ -4,6 +4,7 @@
 #include "sources/availability/availabilitytablemodel.h"
 #include "sources/planner/planner.h"
 #include "sources/schedule/scheduletablemodel.h"
+#include "sources/shifts/shiftstablemodel.h"
 #include "sources/skills/skilltablemodel.h"
 
 #include <QMainWindow>
@@ -26,6 +27,7 @@ public:
 private slots:
     void AddAvailability();
     void AddSkillsAndHours();
+    void AddShifts();
     void Plan();
 
 private:
@@ -34,6 +36,7 @@ private:
     AvailabilityTableModel* m_availabilityModel = nullptr;
     SkillHourTableModel* m_skillsAndHoursModel  = nullptr;
     ScheduleTableModel* m_scheduleTableModel    = nullptr;
+    ShiftsTableModel* m_shiftsTableModel        = nullptr;
     Planner* m_planner                          = nullptr;
 
     //    QMap<QString, QStringList> m_workersAvailabitilty;

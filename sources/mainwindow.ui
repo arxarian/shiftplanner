@@ -93,7 +93,7 @@
     <item row="1" column="0">
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>3</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="pageWorkers">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -131,8 +131,69 @@
       </widget>
       <widget class="QWidget" name="pageShifts">
        <layout class="QGridLayout" name="gridLayout_5">
+        <item row="1" column="0">
+         <widget class="QTabWidget" name="tabWidget">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="tabRegularShifts">
+           <attribute name="title">
+            <string>Regular shifts</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="0" column="0">
+             <widget class="QTableView" name="tableViewRegularShifts"/>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tabDailyShifts">
+           <attribute name="title">
+            <string>Per day shifts</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_7">
+            <item row="0" column="0">
+             <widget class="QTableView" name="tableViewDailyShifts"/>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
         <item row="0" column="0">
-         <widget class="QTableView" name="tableView"/>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QLabel" name="labelFrom">
+            <property name="text">
+             <string>From</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDateEdit" name="dateEditFrom"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelTo">
+            <property name="text">
+             <string>To</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDateEdit" name="dateEditTo"/>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
