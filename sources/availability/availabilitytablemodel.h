@@ -22,8 +22,7 @@ public:
     QMap<QString, QStringList> workersAvailabitilty();
 
 public slots:
-    void setDates(const QStringList& dates);
-    void setWorkersAvailabitilty(const QStringList& workersAvailabitilty);
+    void setAvailability(const QString& availabilityRaw);
 
 signals:
     void workersChanged(QStringList workers);
@@ -33,4 +32,8 @@ private:
     QStringList m_workers;
 
     QMap<QString, QStringList> m_workersAvailabitilty;
+
+private slots:
+    void setDates(const QStringList& dates);
+    void setWorkersAvailabitilty(const QStringList& workersAvailabitilty);
 };

@@ -94,6 +94,19 @@ QMap<QString, QStringList> AvailabilityTableModel::workersAvailabitilty()
     return m_workersAvailabitilty;
 }
 
+void AvailabilityTableModel::setAvailability(const QString& availabilityRaw)
+{
+    QStringList&& rows = availabilityRaw.split(QChar::LineFeed);
+    qDebug() << "rows" << rows;
+    //    QString&& horizontalHeader = rows.takeFirst();
+    //    //    rows.removeFirst(); // useless data
+
+    //    QStringList&& dates = horizontalHeader.split(QChar::Tabulation);
+    //    dates.removeFirst();
+    //    m_availabilityModel->setDates(dates);
+    //    m_availabilityModel->setWorkersAvailabitilty(rows);
+}
+
 // WorkerModel* AvailabilityTableModel::workers() const
 //{
 //    return m_workers;

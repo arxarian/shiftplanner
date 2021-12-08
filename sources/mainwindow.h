@@ -26,7 +26,7 @@ public:
 
 private slots:
     void AddAvailability();
-    void AddSkillsAndHours();
+    void AddProjectWorkers();
     void AddShifts();
     void Plan();
 
@@ -34,13 +34,9 @@ private:
     Ui::MainWindow* ui;
 
     AvailabilityTableModel* m_availabilityModel = nullptr;
-    SkillHourTableModel* m_skillsAndHoursModel  = nullptr;
+    SkillHourTableModel* m_workersModel         = nullptr;
     ScheduleTableModel* m_scheduleTableModel    = nullptr;
     ShiftsTableModel* m_shiftsTableModel        = nullptr;
     Planner* m_planner                          = nullptr;
-
-    //    QMap<QString, QStringList> m_workersAvailabitilty;
-    //    QMap<QString, QSet<QString>> m_workersSkills;
-    //    QMap<QString, qint32> m_workersHours;
 };
 #endif // MAINWINDOW_H
