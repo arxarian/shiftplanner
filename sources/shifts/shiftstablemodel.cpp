@@ -94,7 +94,7 @@ std::array<std::array<Shift, G::DaysPerWeek>, G::ShiftsCount> ShiftsTableModel::
 
 void ShiftsTableModel::setShiftsFromText(const QString& shiftsRaw)
 {
-    QStringList&& rows = shiftsRaw.split(QChar::LineFeed);
+    const QStringList&& rows = shiftsRaw.split(QChar::LineFeed);
 
     qint32 day = 0;
 
@@ -105,8 +105,7 @@ void ShiftsTableModel::setShiftsFromText(const QString& shiftsRaw)
             continue;
         }
 
-        QStringList limits = row.split(QChar::Tabulation);
-        qDebug() << limits;
+        const QStringList& limits = row.split(QChar::Tabulation);
 
         for (qint32 i = 1; i < limits.size(); i = i + 3) // skip day name
         {

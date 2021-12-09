@@ -29,7 +29,9 @@ namespace G
         Covid
     };
 
-    const qint32 Friday = 5;
+    const qint32 Friday   = 5;
+    const qint32 Saturday = 6;
+    const qint32 Sunday   = 7;
 
     //    inline bool isSenior(const QStringList& skills) { return !skills.first().isEmpty(); } // the first skill is the senior skill
     //    inline bool isProject(const QStringList& skills) { return skills.at(1) == Yes; }

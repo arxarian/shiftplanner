@@ -50,11 +50,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->dateEditTo->setDate(date.addDays(-date.day() + date.daysInMonth()));
 
     AddShifts();
-
-    m_scheduleTableModel->setWorkers(m_availabilityModel->workersNames());
-    m_scheduleTableModel->setDates(m_availabilityModel->dates());
-
-    m_planner->Plan(m_availabilityModel, m_workersModel, m_shiftsTableModel);
+    AddProjectWorkers();
 }
 
 MainWindow::~MainWindow()
@@ -70,6 +66,9 @@ void MainWindow::AddAvailability()
     m_availabilityModel->setAvailabilityFromText(text);
 
     //    ui->tableViewAvailability->resizeColumnsToContents();
+
+    m_scheduleTableModel->setWorkers(m_availabilityModel->workersNames());
+    m_scheduleTableModel->setDates(m_availabilityModel->dates());
 }
 
 void MainWindow::AddProjectWorkers()

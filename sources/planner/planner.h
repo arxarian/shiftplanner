@@ -23,11 +23,12 @@ signals:
 
 private:
     AvailabilityTableModel* m_availabilityModel = nullptr;
-    WorkersModel* m_skillHourModel       = nullptr;
+    WorkersModel* m_skillHourModel              = nullptr;
     ShiftsTableModel* m_shiftsTableModel        = nullptr;
 
     std::array<std::vector<std::vector<int>>, G::ShiftsCount> m_schedule; // shifts, slots, workers
 
 private:
     void ScheduleRequestsSat();
+    bool Validate();
 };
