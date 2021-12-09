@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->toolButtonShiftsFrame, &QToolButton::clicked, this, [this] { ui->stackedWidget->setCurrentIndex(2); });
     connect(ui->toolButtonScheduleFrame, &QToolButton::clicked, this, [this] { ui->stackedWidget->setCurrentIndex(3); });
 
-    //    connect(ui->pushButtonAddWorkers, &QPushButton::clicked, this, &MainWindow::AddAvailability);
+    connect(ui->pushButtonAddAvailability, &QPushButton::clicked, this, &MainWindow::AddAvailability);
     connect(ui->pushButtonAddProjectWorkers, &QPushButton::clicked, this, &MainWindow::AddProjectWorkers);
     connect(ui->pushButtonAddNonProjectWorkers, &QPushButton::clicked, this, &MainWindow::AddNonProjectWorkers);
     connect(ui->pushButtonGenerate, &QPushButton::clicked, this, &MainWindow::Plan);
@@ -49,11 +49,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->dateEditFrom->setDate(date.addDays(-date.day() + 1));
     ui->dateEditTo->setDate(date.addDays(-date.day() + date.daysInMonth()));
 
-    //    AddAvailability();
-    //    AddSkillsAndHours();
     AddShifts();
 
-    m_scheduleTableModel->setWorkers(m_availabilityModel->workers());
+    m_scheduleTableModel->setWorkers(m_availabilityModel->workersNames());
     m_scheduleTableModel->setDates(m_availabilityModel->dates());
 
     m_planner->Plan(m_availabilityModel, m_workersModel, m_shiftsTableModel);
@@ -66,26 +64,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::AddAvailability()
 {
-    //    const QString& text = QString("\t25. 10.\t26. 10.\t27. 10.\t28. 10.\t29. 10.\n"
-    //                                  "Karel\tR/O\tR/O\tR/O\tR/O\tR/O\n"
-    //                                  "Marek\tX\tC\tC\tR/O\tO\n"
-    //                                  "Karolina\tC\tO\tX\tR\tR\n"
-    //                                  "Lenka\tC\tC\tR\tX\tR\n"
-    //                                  "Simona\tC\tC\tC\tR/O\tO\n"
-    //                                  "Pavel\tR\tR\tR\tR\tR\n"
-    //                                  "Cupito\tC\tC\tR\tX\tR\n"
-    //                                  "Standa\tR/O\tR/O\tR/O\tR/O\tO\n"
-    //                                  "Julie\tC\tC\tC\tC\tC\n"
-    //                                  "Jan\tC\tO\tR\tC\tR\n"
-    //                                  "Lenka\tC\tC\tC\tR\tC\n"
-    //                                  "Jan\tR/O\tR/O\tR/O\tR/O\tR\n"
-    //                                  "Superman\tC\tC\tC\tC\tC\n"
-    //                                  "Lois\tC\tC\tC\tC\tC\n");
-
     QClipboard* clipboard = QGuiApplication::clipboard();
     const QString& text   = clipboard->text();
 
-    m_availabilityModel->setAvailability(text);
+    m_availabilityModel->setAvailabilityFromText(text);
 
     //    ui->tableViewAvailability->resizeColumnsToContents();
 }
@@ -118,7 +100,7 @@ void MainWindow::AddShifts()
                                   "Thursday\t12\t12\t12\t7\t7\t8\t1\t1\t2\n"
                                   "Friday\t11\t11\t11\t6\t6\t7\t1\t1\t2\n");
 
-    m_shiftsTableModel->setShifts(text);
+    m_shiftsTableModel->setShiftsFromText(text);
 }
 
 void MainWindow::Plan()

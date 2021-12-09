@@ -92,7 +92,7 @@ std::array<std::array<Shift, G::DaysPerWeek>, G::ShiftsCount> ShiftsTableModel::
     return m_shifts;
 }
 
-void ShiftsTableModel::setShifts(const QString& shiftsRaw)
+void ShiftsTableModel::setShiftsFromText(const QString& shiftsRaw)
 {
     QStringList&& rows = shiftsRaw.split(QChar::LineFeed);
 

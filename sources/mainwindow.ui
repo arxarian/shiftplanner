@@ -98,9 +98,9 @@
       <widget class="QWidget" name="pageWorkers">
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
-         <widget class="QToolButton" name="pushButtonAddWorkers">
+         <widget class="QToolButton" name="pushButtonAddAvailability">
           <property name="text">
-           <string>Add availibility</string>
+           <string>Paste availibility</string>
           </property>
          </widget>
         </item>
