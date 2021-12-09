@@ -101,6 +101,12 @@ void Planner::ScheduleRequestsSat()
 
         Q_ASSERT(date.isValid());
 
+        if (date.day() == 17) // a nation holiday
+        {
+            // TODO - a big hack for now
+            continue;
+        }
+
         const qint32 dayOfWeek = date.dayOfWeek();
 
         if (dayOfWeek == G::Saturday || dayOfWeek == G::Sunday)
@@ -191,50 +197,50 @@ void Planner::ScheduleRequestsSat()
         cp_model.AddLessOrEqual(LinearExpr::Sum(x), workersSets.value(worker).m_hours / 4); // each slot has four hours
     }
 
-    //    //! each worker works at most one slot according to his/her requirements
-    //    const QMap<QString, QStringList>& workersAvailabitilty = m_availabilityModel->workersAvailabitilty();
-    //    for (int n : all_workers)
-    //    {
-    //        const QString& worker              = workers.at(n);
-    //        const QStringList& availabitilties = workersAvailabitilty.value(worker);
+    //! each worker works at most one slot according to his/her requirements
+    const QMap<QString, QStringList>& workersAvailabitilty = m_availabilityModel->workersAvailabitilty();
+    for (int n : all_workers)
+    {
+        const QString& worker              = workers.at(n);
+        const QStringList& availabitilties = workersAvailabitilty.value(worker);
 
-    //        if (availabitilties.size() != num_days)
-    //        {
-    //            qInfo() << "worker" << worker << "has no availability defined";
-    //            continue;
-    //        }
+        if (availabitilties.size() != num_days)
+        {
+            qInfo() << "worker" << worker << "has invalid availabilities";
+            continue;
+        }
 
-    //        for (int d : all_slots)
-    //        {
-    //            std::vector<IntVar> x;
-    //            for (int s : all_shifts)
-    //            {
-    //                auto key = std::make_tuple(n, d, s);
-    //                x.push_back(shifts[key]);
-    //            }
+        for (int d : all_slots)
+        {
+            std::vector<IntVar> x;
+            for (int s : all_shifts)
+            {
+                auto key = std::make_tuple(n, d, s);
+                x.push_back(shifts[key]);
+            }
 
-    //            const QString& availabitilty = availabitilties.at(d / G::SlotsPerDay);
-    //            const bool morning           = (d + 1) % G::SlotsPerDay;
-    //            // respect workers requirements: if worker is not available, do not add it, otherwise he can work only one slot
-    //            cp_model.AddLessOrEqual(LinearExpr::Sum(x), available(availabitilty, morning));
+            const QString& availabitilty = availabitilties.at(d / G::SlotsPerDay);
+            const bool morning           = (d + 1) % G::SlotsPerDay;
+            // respect workers requirements: if worker is not available, do not add it, otherwise he can work only one slot
+            cp_model.AddLessOrEqual(LinearExpr::Sum(x), available(availabitilty, morning));
 
-    //            if (morning && availabitilty == G::MorningOrAfternoonShift)
-    //            {
-    //                std::vector<IntVar> y;
-    //                for (int s : all_shifts)
-    //                {
-    //                    auto key = std::make_tuple(n, d, s);
-    //                    y.push_back(shifts[key]);
-    //                }
-    //                for (int s : all_shifts)
-    //                {
-    //                    auto key = std::make_tuple(n, d + 1, s);
-    //                    y.push_back(shifts[key]);
-    //                }
-    //                cp_model.AddLessOrEqual(LinearExpr::Sum(y), 1);
-    //            }
-    //        }
-    //    }
+            if (morning && availabitilty == G::MorningOrAfternoonShift)
+            {
+                std::vector<IntVar> y;
+                for (int s : all_shifts)
+                {
+                    auto key = std::make_tuple(n, d, s);
+                    y.push_back(shifts[key]);
+                }
+                for (int s : all_shifts)
+                {
+                    auto key = std::make_tuple(n, d + 1, s);
+                    y.push_back(shifts[key]);
+                }
+                cp_model.AddLessOrEqual(LinearExpr::Sum(y), 1);
+            }
+        }
+    }
 
     //! assign shifts evenly
     //    const int min_shifts_per_nurse = (num_shifts * num_days) / num_workers;
