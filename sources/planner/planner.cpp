@@ -59,8 +59,6 @@ void Planner::ScheduleRequestsSat()
     const int num_days          = dates.size();
     const int num_slots         = num_days * num_slots_per_day;
 
-    Q_ASSERT(G::ShiftsNames.size() == num_shifts);
-
     std::vector<int> all_workers(num_workers);
     std::iota(all_workers.begin(), all_workers.end(), 0);
 
@@ -177,22 +175,21 @@ void Planner::ScheduleRequestsSat()
     //        }
     //    }
 
-    //    //! workers hours fond
-    //    const QMap<QString, qint32>& workerHours = m_skillHourModel->workersHours();
-    //    for (int n : all_workers)
-    //    {
-    //        std::vector<IntVar> x;
-    //        for (int s : all_shifts)
-    //        {
-    //            for (int d : all_slots)
-    //            {
-    //                auto key = std::make_tuple(n, d, s);
-    //                x.push_back(shifts[key]);
-    //            }
-    //        }
-    //        const QString& worker = workers.at(n);
-    //        cp_model.AddLessOrEqual(LinearExpr::Sum(x), workerHours.value(worker) / 4); // each slot has four hours
-    //    }
+    //! workers hours fond
+    for (int n : all_workers)
+    {
+        std::vector<IntVar> x;
+        for (int s : all_shifts)
+        {
+            for (int d : all_slots)
+            {
+                auto key = std::make_tuple(n, d, s);
+                x.push_back(shifts[key]);
+            }
+        }
+        const QString& worker = workers.at(n);
+        cp_model.AddLessOrEqual(LinearExpr::Sum(x), workersSets.value(worker).m_hours / 4); // each slot has four hours
+    }
 
     //    //! each worker works at most one slot according to his/her requirements
     //    const QMap<QString, QStringList>& workersAvailabitilty = m_availabilityModel->workersAvailabitilty();
@@ -273,7 +270,7 @@ void Planner::ScheduleRequestsSat()
         const QMap<QString, WorkerSet>& workersSets = m_skillHourModel->workers();
         const QStringList& workers                  = m_skillHourModel->workersNames();
 
-        for (qint32 i = 0; i < G::ShiftsCount; ++i)
+        for (qint32 i = 0; i < num_shifts; ++i)
         {
             m_schedule[i].clear();
             m_schedule[i].resize(num_slots);

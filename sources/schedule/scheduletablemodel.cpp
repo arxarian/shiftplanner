@@ -62,6 +62,10 @@ QVariant ScheduleTableModel::data(const QModelIndex& index, int role) const
             // shifts names
             return G::ShiftsNames.at(shift);
         }
+        else if (index.column() == columnCount() - 1 && description)
+        {
+            return "Hours";
+        }
         else if (index.column() > 0 && description)
         {
             // dates
@@ -71,6 +75,31 @@ QVariant ScheduleTableModel::data(const QModelIndex& index, int role) const
         {
             // workers names
             return m_workersNames.at(m_workersIdsPerShift.at(shift).at(row));
+        }
+        else if (index.column() == columnCount() - 1)
+        {
+            const qint32 workerId                      = m_workersIdsPerShift.at(shift).at(row);
+            const std::vector<std::vector<int>> _slots = m_schedule.at(shift);
+
+            // shifts / slots / names
+            // TODO - redo, very expensive
+            qint32 hours = 0;
+
+            for (const auto& shift : m_schedule)
+            {
+                for (const auto& _slot : shift)
+                {
+                    for (const auto& worker : _slot)
+                    {
+                        if (worker == workerId)
+                        {
+                            hours += 4;
+                        }
+                    }
+                }
+            }
+
+            return hours;
         }
         else
         {
@@ -159,7 +188,7 @@ void ScheduleTableModel::setSchedule(std::array<std::vector<std::vector<int>>, G
     }
 
     m_rows    = std::accumulate(m_workersCount.begin(), m_workersCount.end(), 0) + 3; // [booking, names, residences, names, covid, names]
-    m_columns = schedule.front().size() / 2 + 1;                                      // [names, dates]
+    m_columns = schedule.front().size() / 2 + 1 + 1;                                  // [names, dates, total hours]
 
     emit dataChanged(index(0, 0), index(m_rows - 1, m_columns - 1));
 

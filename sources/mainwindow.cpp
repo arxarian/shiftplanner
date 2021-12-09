@@ -122,11 +122,11 @@ void MainWindow::AddNonProjectWorkers()
 
 void MainWindow::AddShifts()
 {
-    const QString& text = QString("Monday\t15\t15\t15\t9\t11\t11\t2\t2\t2\n"
-                                  "Tuesday\t15\t15\t16\t8\t9\t9\t2\t2\t3\n"
-                                  "Wednesday\t15\t15\t16\t8\t9\t9\t2\t2\t3\n"
-                                  "Thursday\t12\t12\t12\t7\t7\t8\t1\t1\t2\n"
-                                  "Friday\t11\t11\t11\t6\t6\t7\t1\t1\t2\n");
+    const QString& text = QString("Monday\t9\t11\t11\t15\t15\t15\t2\t2\t2\n"
+                                  "Tuesday\t8\t9\t9\t15\t15\t16\t2\t2\t3\n"
+                                  "Wednesday\t8\t9\t9\t15\t15\t16\t2\t2\t3\n"
+                                  "Thursday\t7\t7\t8\t12\t12\t12\t1\t1\t2\n"
+                                  "Friday\t6\t6\t7\t11\t11\t11\t1\t1\t2\n");
 
     m_shiftsTableModel->setShiftsFromText(text);
 }
