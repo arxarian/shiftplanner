@@ -20,7 +20,7 @@ namespace TablePositions
 
 QString name(const QStringList& splittedRow)
 {
-    return QString("%1 %2").arg(splittedRow.at(TablePositions::Surname)).arg(splittedRow.at(TablePositions::Name));
+    return QString("%1 %2").arg(splittedRow.at(TablePositions::Surname), splittedRow.at(TablePositions::Name));
 }
 
 Skills::SkillLevel booking(const QStringList& splittedRow)
@@ -38,26 +38,26 @@ Skills::SkillLevel covid(const QStringList& splittedRow)
     return Skills::TextToSkillLevel(splittedRow.at(TablePositions::CovidSkill));
 }
 
-SkillHourTableModel::SkillHourTableModel(QObject* parent) : QAbstractTableModel(parent)
+WorkersModel::WorkersModel(QObject* parent) : QAbstractTableModel(parent)
 {
     //
 }
 
-int SkillHourTableModel::rowCount(const QModelIndex& parent) const
+int WorkersModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent)
 
     return m_workersNames.count();
 }
 
-int SkillHourTableModel::columnCount(const QModelIndex& parent) const
+int WorkersModel::columnCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent)
 
     return G::SkillsNames.count() + 2; // + 2 because of [name, residences, booking, covid, hours]
 }
 
-QVariant SkillHourTableModel::data(const QModelIndex& index, int role) const
+QVariant WorkersModel::data(const QModelIndex& index, int role) const
 {
     if (!index.isValid() || index.row() >= rowCount(QModelIndex()) || index.column() >= columnCount(QModelIndex()))
     {
@@ -73,19 +73,19 @@ QVariant SkillHourTableModel::data(const QModelIndex& index, int role) const
         }
         else if (index.column() < G::SkillsNames.count() + 1) // becuse in the first column, there is the name
         {
-            const Skills& skills = m_workersSkills.value(worker);
+            const Skills& skills = m_workers.value(worker).m_skills;
             return Skills::SkillLevelToText(skills.skills.at(index.column() - 1)); // becuse in the first column, there is the name
         }
         else if (index.column() == G::SkillsNames.count() + 1)
         {
-            return m_workersHours.value(worker);
+            return m_workers.value(worker).m_hours;
         }
     }
 
     return QVariant();
 }
 
-QVariant SkillHourTableModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant WorkersModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role == Qt::DisplayRole)
     {
@@ -112,29 +112,22 @@ QVariant SkillHourTableModel::headerData(int section, Qt::Orientation orientatio
     return QVariant();
 }
 
-QStringList SkillHourTableModel::workersNames() const
+QStringList WorkersModel::workersNames() const
 {
     return m_workersNames;
 }
 
-QMap<QString, Skills> SkillHourTableModel::workersSkills()
+QMap<QString, WorkerSet> WorkersModel::workers() const
 {
-    return m_workersSkills;
+    return m_workers;
 }
 
-QMap<QString, qint32> SkillHourTableModel::workersHours()
-{
-    return m_workersHours;
-}
-
-void SkillHourTableModel::setWorkersFromText(const QString& workersSkillsRaw, const bool project)
+void WorkersModel::setWorkersFromText(const QString& workersSkillsRaw, const bool project)
 {
     QStringList&& rows = workersSkillsRaw.split(QChar::LineFeed);
     rows.removeFirst();
 
-    m_workersNames.clear();
-    m_workersSkills.clear();
-    m_workersHours.clear();
+    beginResetModel();
 
     for (const QString& row : rows)
     {
@@ -144,18 +137,27 @@ void SkillHourTableModel::setWorkersFromText(const QString& workersSkillsRaw, co
         }
 
         const QStringList& splittedRow = row.split(QChar::Tabulation);
-        m_workersNames.append(name(splittedRow));
+        const QString& workerName      = name(splittedRow);
 
-        m_workersHours[m_workersNames.last()]  = G::MaxHoursPerMonth;
-        m_workersSkills[m_workersNames.last()] = Skills{.skills{
+        if (m_workersNames.contains(workerName))
+        {
+            qInfo() << "operator" << workerName << "exists";
+            continue;
+        }
+
+        m_workersNames.append(workerName);
+
+        m_workers[m_workersNames.last()].m_project = project;
+        m_workers[m_workersNames.last()].m_skills  = Skills{.skills{
           residences(splittedRow),
           booking(splittedRow),
           covid(splittedRow),
         }};
+        m_workers[m_workersNames.last()].m_hours   = G::MaxHoursPerMonth;
     }
 
-    emit headerDataChanged(Qt::Vertical, 0, columnCount() - 1);
-    emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
+    endResetModel();
+
     emit workersChanged(m_workersNames);
 }
 

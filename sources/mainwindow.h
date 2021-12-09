@@ -27,6 +27,7 @@ public:
 private slots:
     void AddAvailability();
     void AddProjectWorkers();
+    void AddNonProjectWorkers();
     void AddShifts();
     void Plan();
 
@@ -34,7 +35,7 @@ private:
     Ui::MainWindow* ui;
 
     AvailabilityTableModel* m_availabilityModel = nullptr;
-    SkillHourTableModel* m_workersModel         = nullptr;
+    WorkersModel* m_workersModel                = nullptr;
     ScheduleTableModel* m_scheduleTableModel    = nullptr;
     ShiftsTableModel* m_shiftsTableModel        = nullptr;
     Planner* m_planner                          = nullptr;

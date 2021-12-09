@@ -93,7 +93,7 @@
     <item row="1" column="0">
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="pageWorkers">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -148,7 +148,13 @@
              <widget class="QTableView" name="tableViewNonProjectWorkers"/>
             </item>
             <item row="1" column="0">
-             <widget class="QToolButton" name="toolButtonAddNonProjectWorkers">
+             <widget class="QPushButton" name="pushButtonAddNonProjectWorkers">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text">
                <string>Paste workers</string>
               </property>
@@ -165,7 +171,7 @@
         <item row="1" column="0">
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tabRegularShifts">
            <attribute name="title">

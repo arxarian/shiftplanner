@@ -300,7 +300,7 @@ void Planner::ScheduleRequestsSat()
     //    LOG(INFO) << CpSolverResponseStats(response);
 }
 
-void Planner::Plan(AvailabilityTableModel* availabilityModel, SkillHourTableModel* skillHourModel, ShiftsTableModel* shiftsTableModel)
+void Planner::Plan(AvailabilityTableModel* availabilityModel, WorkersModel* skillHourModel, ShiftsTableModel* shiftsTableModel)
 {
     m_availabilityModel = availabilityModel;
     m_skillHourModel    = skillHourModel;

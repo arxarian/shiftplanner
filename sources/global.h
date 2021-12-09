@@ -4,7 +4,7 @@
 
 namespace G
 {
-    const qint32 MaxHoursPerMonth = 80;
+    const qint32 MaxHoursPerMonth = 82;
 
     const qint32 DaysPerWeek = 5;
     const qint32 ShiftsCount = 3;

@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     m_planner            = new Planner(this);
     m_availabilityModel  = new AvailabilityTableModel(this);
     m_scheduleTableModel = new ScheduleTableModel(this);
-    m_workersModel       = new SkillHourTableModel(this);
+    m_workersModel       = new WorkersModel(this);
     m_shiftsTableModel   = new ShiftsTableModel(this);
 
     connect(m_planner, &Planner::Planned, m_scheduleTableModel, &ScheduleTableModel::setSchedule);
@@ -26,12 +26,20 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->toolButtonShiftsFrame, &QToolButton::clicked, this, [this] { ui->stackedWidget->setCurrentIndex(2); });
     connect(ui->toolButtonScheduleFrame, &QToolButton::clicked, this, [this] { ui->stackedWidget->setCurrentIndex(3); });
 
-    connect(ui->pushButtonAddWorkers, &QPushButton::clicked, this, &MainWindow::AddAvailability);
+    //    connect(ui->pushButtonAddWorkers, &QPushButton::clicked, this, &MainWindow::AddAvailability);
     connect(ui->pushButtonAddProjectWorkers, &QPushButton::clicked, this, &MainWindow::AddProjectWorkers);
+    connect(ui->pushButtonAddNonProjectWorkers, &QPushButton::clicked, this, &MainWindow::AddNonProjectWorkers);
     connect(ui->pushButtonGenerate, &QPushButton::clicked, this, &MainWindow::Plan);
 
+    QSortFilterProxyModel* projectWorkersFilter = new QSortFilterProxyModel(this);
+    projectWorkersFilter->setSourceModel(m_workersModel);
+
+    QSortFilterProxyModel* nonProjectWorkersFilter = new QSortFilterProxyModel(this);
+    nonProjectWorkersFilter->setSourceModel(m_workersModel);
+
     ui->tableViewAvailability->setModel(m_availabilityModel);
-    ui->tableViewProjectWorkers->setModel(m_workersModel);
+    ui->tableViewProjectWorkers->setModel(projectWorkersFilter);
+    ui->tableViewNonProjectWorkers->setModel(nonProjectWorkersFilter);
     ui->tableViewRegularShifts->setModel(m_shiftsTableModel);
     ui->tableViewSchedule->setModel(m_scheduleTableModel);
 
@@ -43,7 +51,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     //    AddAvailability();
     //    AddSkillsAndHours();
-    //    AddShifts();
+    AddShifts();
 
     m_scheduleTableModel->setWorkers(m_availabilityModel->workers());
     m_scheduleTableModel->setDates(m_availabilityModel->dates());
@@ -84,26 +92,20 @@ void MainWindow::AddAvailability()
 
 void MainWindow::AddProjectWorkers()
 {
-    //    const QString& text = QString("\tSenior\tProject\tResidencest\tBooking\tCovid\tHours\n"
-    //                                  "Karel\tX\tNE\t\t\tX\t80\n"
-    //                                  "Marek\t\tANO\tX\tX\t\t80\n"
-    //                                  "Karolina\t\tANO\tX\tX\tX\t80\n"
-    //                                  "Lenka\tX\tANO\t\tX\tX\t80\n"
-    //                                  "Simona\tX\tNE\tX\t\tX\t80\n"
-    //                                  "Pavel\tX\tNE\t\tX\tX\t80\n"
-    //                                  "Cupito\tX\tANO\t\tX\tX\t20\n"
-    //                                  "Standa\t\tANO\t\t\tX\t80\n"
-    //                                  "Julie\tX\tNE\tX\tX\t\t80\n"
-    //                                  "Jan\tX\tANO\tX\tX\t\t80\n"
-    //                                  "Lenka\tX\tNE\tX\tX\t\t80\n"
-    //                                  "Jan\t\tANO\tX\tX\tX\t80\n"
-    //                                  "Superman\tX\tANO\tX\tX\tX\t80\n"
-    //                                  "Lois\tX\tNE\tX\tX\tX\t80\n");
-
     QClipboard* clipboard = QGuiApplication::clipboard();
     const QString& text   = clipboard->text();
 
     m_workersModel->setWorkersFromText(text, true);
+
+    ui->tableViewProjectWorkers->resizeColumnsToContents();
+}
+
+void MainWindow::AddNonProjectWorkers()
+{
+    QClipboard* clipboard = QGuiApplication::clipboard();
+    const QString& text   = clipboard->text();
+
+    m_workersModel->setWorkersFromText(text, false);
 
     ui->tableViewProjectWorkers->resizeColumnsToContents();
 }
