@@ -35,5 +35,5 @@ private:
 
 private slots:
     void setDates(const QStringList& splittedRow);
-    void setWorkersAvailabitilty(const QStringList& splittedRow);
+    void setWorkersAvailabitilty(const QString& name, const QStringList& splittedRow);
 };

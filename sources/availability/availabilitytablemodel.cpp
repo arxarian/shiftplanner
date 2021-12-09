@@ -107,7 +107,7 @@ void AvailabilityTableModel::setAvailabilityFromText(const QString& availability
             break; // no more valid data
         }
 
-        const QString& nameOrTypeColumn = splittedRow.at(1);
+        const QString& nameOrTypeColumn = splittedRow.at(1).toLower();
 
         if (nameOrTypeColumn.isEmpty())
         {
@@ -127,18 +127,17 @@ void AvailabilityTableModel::setAvailabilityFromText(const QString& availability
         {
             if (m_workersNames.contains(nameOrTypeColumn))
             {
-                qDebug() << "woker" << nameOrTypeColumn << "already exists";
-                qDebug() << splittedRow;
+                qInfo() << "woker" << nameOrTypeColumn << "already exists";
             }
 
             m_workersNames.append(nameOrTypeColumn);
-            setWorkersAvailabitilty(splittedRow);
+            setWorkersAvailabitilty(nameOrTypeColumn, splittedRow);
         }
     }
 
     endResetModel();
 
-    qDebug() << "availability set";
+    qInfo() << "availability set";
 }
 
 
@@ -151,7 +150,7 @@ void AvailabilityTableModel::setDates(const QStringList& splittedRow)
     emit headerDataChanged(Qt::Horizontal, 0, columnCount() - 1);
 }
 
-void AvailabilityTableModel::setWorkersAvailabitilty(const QStringList& splittedRow)
+void AvailabilityTableModel::setWorkersAvailabitilty(const QString& name, const QStringList& splittedRow)
 {
-    m_workersAvailabitilty[splittedRow.at(1)] = splittedRow.mid(2, m_dates.count());
+    m_workersAvailabitilty[name] = splittedRow.mid(2, m_dates.count());
 }

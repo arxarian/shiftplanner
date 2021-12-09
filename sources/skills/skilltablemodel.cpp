@@ -20,7 +20,7 @@ namespace TablePositions
 
 QString name(const QStringList& splittedRow)
 {
-    return QString("%1 %2").arg(splittedRow.at(TablePositions::Surname), splittedRow.at(TablePositions::Name));
+    return QString("%1 %2").arg(splittedRow.at(TablePositions::Surname), splittedRow.at(TablePositions::Name)).toLower().simplified();
 }
 
 Skills::SkillLevel booking(const QStringList& splittedRow)
