@@ -51,6 +51,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     AddShifts();
     AddProjectWorkers();
+    AddNonProjectWorkers();
+    AddAvailability();
 }
 
 MainWindow::~MainWindow()
@@ -60,8 +62,17 @@ MainWindow::~MainWindow()
 
 void MainWindow::AddAvailability()
 {
-    QClipboard* clipboard = QGuiApplication::clipboard();
-    const QString& text   = clipboard->text();
+    //    QClipboard* clipboard = QGuiApplication::clipboard();
+    //    const QString& text   = clipboard->text();
+
+    QString text;
+
+    QFile f("availabilities_november.txt");
+    if (f.open(QFile::ReadOnly | QFile::Text))
+    {
+        QTextStream in(&f);
+        text = in.readAll();
+    }
 
     m_availabilityModel->setAvailabilityFromText(text);
 
@@ -73,8 +84,17 @@ void MainWindow::AddAvailability()
 
 void MainWindow::AddProjectWorkers()
 {
-    QClipboard* clipboard = QGuiApplication::clipboard();
-    const QString& text   = clipboard->text();
+    //    QClipboard* clipboard = QGuiApplication::clipboard();
+    //    const QString& text   = clipboard->text();
+
+    QString text;
+
+    QFile f("project_workers.txt");
+    if (f.open(QFile::ReadOnly | QFile::Text))
+    {
+        QTextStream in(&f);
+        text = in.readAll();
+    }
 
     m_workersModel->setWorkersFromText(text, true);
 
@@ -83,8 +103,17 @@ void MainWindow::AddProjectWorkers()
 
 void MainWindow::AddNonProjectWorkers()
 {
-    QClipboard* clipboard = QGuiApplication::clipboard();
-    const QString& text   = clipboard->text();
+    //    QClipboard* clipboard = QGuiApplication::clipboard();
+    //    const QString& text   = clipboard->text();
+
+    QString text;
+
+    QFile f("non_project_workers.txt");
+    if (f.open(QFile::ReadOnly | QFile::Text))
+    {
+        QTextStream in(&f);
+        text = in.readAll();
+    }
 
     m_workersModel->setWorkersFromText(text, false);
 

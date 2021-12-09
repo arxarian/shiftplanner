@@ -159,6 +159,8 @@ void WorkersModel::setWorkersFromText(const QString& workersSkillsRaw, const boo
     endResetModel();
 
     emit workersChanged(m_workersNames);
+
+    qInfo() << (project ? "project" : "non-project") << "workers set";
 }
 
 bool Skills::ResidencesSkill() const
