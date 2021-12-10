@@ -26,7 +26,7 @@ public:
     std::array<std::array<Shift, G::DaysPerWeek>, G::ShiftsCount> Shifts();
 
 public slots:
-    void setShifts(const QString& shiftsRaw);
+    void setShiftsFromText(const QString& shiftsRaw);
 
 signals:
 

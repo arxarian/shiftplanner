@@ -59,8 +59,6 @@ void Planner::ScheduleRequestsSat()
     const int num_days          = dates.size();
     const int num_slots         = num_days * num_slots_per_day;
 
-    Q_ASSERT(G::ShiftsNames.size() == num_shifts);
-
     std::vector<int> all_workers(num_workers);
     std::iota(all_workers.begin(), all_workers.end(), 0);
 
@@ -89,86 +87,101 @@ void Planner::ScheduleRequestsSat()
     }
 
     //! each shift is assigned to a min-to-max workers per day, set 0 workers on Friday afternoon
-    const std::array min_workers = {2, 1, 2}; // Residences, Booking, Covid
-    const std::array max_workers = {3, 3, 5}; // Residences, Booking, Covid
+    // [covid, residences, booking][monday - friday][min, opt, max]
+    const auto& shiftsLimits = m_shiftsTableModel->Shifts();
 
-    const QStringList& workers                     = m_skillHourModel->workers();
-    const QMap<QString, QStringList>& workerSkills = m_skillHourModel->workersSkills();
+    const QStringList& workers                  = m_skillHourModel->workersNames();
+    const QMap<QString, WorkerSet>& workersSets = m_skillHourModel->workers();
 
     for (int d : all_slots) // ALL DAYS {MORNING, AFTERNOON}
     {
+        // TODO - need to set year
+        // TODO - move date validation to availability model
+        const QDate& date = QDate::fromString(QString("%1 %2").arg(dates.at(d / 2)).arg(QDate::currentDate().year()), "d.M. yyyy");
+
+        Q_ASSERT(date.isValid());
+
+        if (date.day() == 17) // a nation holiday
+        {
+            // TODO - a big hack for now
+            continue;
+        }
+
+        const qint32 dayOfWeek = date.dayOfWeek();
+
+        if (dayOfWeek == G::Saturday || dayOfWeek == G::Sunday)
+        {
+            continue; // no work during weekends
+        }
+
         for (int s : all_shifts) // Residences, Booking, Covid
         {
+            const auto& shiftLimits = shiftsLimits.at(s);
+
             std::vector<IntVar> x;
             for (int n : all_workers)
             {
-                const QString& worker = workers.at(n);
-                // if worker does not have the skill, do not add it
-                if (workerSkills.value(worker).at(s + 2).isEmpty()) // the first two skills are "Senior" and "Project"
+                const QString& worker          = workers.at(n);
+                const WorkerSet& workerSet     = workersSets.value(worker);
+                const Skills::SkillLevel level = workerSet.m_skills.skills.at(s);
+                // if worker has the skill, add him
+                if (level > Skills::None)
                 {
-                    continue;
+                    auto key = std::make_tuple(n, d, s);
+                    x.push_back(shifts[key]);
                 }
-
-                // worker has the skill
-                auto key = std::make_tuple(n, d, s);
-                x.push_back(shifts[key]);
             }
 
             // make Fridays only mornings
-            const QDate& date = QDate::fromString(QString("%1 %2").arg(dates.at(d / 2)).arg(QDate::currentDate().year()), "d. M. yyyy");
-
-            Q_ASSERT(date.isValid());
-
             const bool afternoon = d % 2;
-            if (date.dayOfWeek() == G::Friday && afternoon)
+            if (dayOfWeek == G::Friday && afternoon)
             {
                 cp_model.AddLessOrEqual(0, LinearExpr::Sum(x)); // zero workers on Friday afternoon
+                cp_model.AddLessOrEqual(LinearExpr::Sum(x), 0);
             }
             else
             {
-                cp_model.AddLessOrEqual(min_workers[s], LinearExpr::Sum(x));
+                cp_model.AddLessOrEqual(shiftLimits.at(dayOfWeek - 1).minimal, LinearExpr::Sum(x));
+                cp_model.AddLessOrEqual(LinearExpr::Sum(x), shiftLimits.at(dayOfWeek - 1).maximal);
             }
-
-            cp_model.AddLessOrEqual(LinearExpr::Sum(x), max_workers[s]);
         }
     }
 
-    //! each slot need to have at least one senior worker, one project worker and one non-project worker
-    for (int d : all_slots)
-    {
-        for (int s : all_shifts)
-        {
-            std::vector<IntVar> seniors;
-            std::vector<IntVar> projects;
-            std::vector<IntVar> nonProjects;
-            for (int n : all_workers)
-            {
-                const QString& worker     = workers.at(n);
-                const QStringList& skills = workerSkills.value(worker);
+    //    //! each slot need to have at least one senior worker, one project worker and one non-project worker
+    //    for (int d : all_slots)
+    //    {
+    //        for (int s : all_shifts)
+    //        {
+    //            std::vector<IntVar> seniors;
+    //            std::vector<IntVar> projects;
+    //            std::vector<IntVar> nonProjects;
+    //            for (int n : all_workers)
+    //            {
+    //                const QString& worker     = workers.at(n);
+    //                const QStringList& skills = workersSets.value(worker);
 
-                auto shiftKey = std::make_tuple(n, d, s);
-                if (G::isSenior(skills))
-                {
-                    seniors.push_back(shifts[shiftKey]);
-                }
+    //                auto shiftKey = std::make_tuple(n, d, s);
+    //                if (G::isSenior(skills))
+    //                {
+    //                    seniors.push_back(shifts[shiftKey]);
+    //                }
 
-                if (G::isProject(skills))
-                {
-                    projects.push_back(shifts[shiftKey]);
-                }
-                else
-                {
-                    nonProjects.push_back(shifts[shiftKey]);
-                }
-            }
-            cp_model.AddGreaterOrEqual(LinearExpr::Sum(seniors), 1);     // is there at least one senior worker
-            cp_model.AddGreaterOrEqual(LinearExpr::Sum(projects), 1);    // is there at least one project worker
-            cp_model.AddGreaterOrEqual(LinearExpr::Sum(nonProjects), 1); // is there at least one non project worker
-        }
-    }
+    //                if (G::isProject(skills))
+    //                {
+    //                    projects.push_back(shifts[shiftKey]);
+    //                }
+    //                else
+    //                {
+    //                    nonProjects.push_back(shifts[shiftKey]);
+    //                }
+    //            }
+    //            cp_model.AddGreaterOrEqual(LinearExpr::Sum(seniors), 1);     // is there at least one senior worker
+    //            cp_model.AddGreaterOrEqual(LinearExpr::Sum(projects), 1);    // is there at least one project worker
+    //            cp_model.AddGreaterOrEqual(LinearExpr::Sum(nonProjects), 1); // is there at least one non project worker
+    //        }
+    //    }
 
     //! workers hours fond
-    const QMap<QString, qint32>& workerHours = m_skillHourModel->workersHours();
     for (int n : all_workers)
     {
         std::vector<IntVar> x;
@@ -181,14 +194,22 @@ void Planner::ScheduleRequestsSat()
             }
         }
         const QString& worker = workers.at(n);
-        cp_model.AddLessOrEqual(LinearExpr::Sum(x), workerHours.value(worker) / 4); // each slot has four hours
+        cp_model.AddLessOrEqual(LinearExpr::Sum(x), workersSets.value(worker).m_hours / 4); // each slot has four hours
     }
 
     //! each worker works at most one slot according to his/her requirements
     const QMap<QString, QStringList>& workersAvailabitilty = m_availabilityModel->workersAvailabitilty();
     for (int n : all_workers)
     {
-        const QStringList& availabitilties = workersAvailabitilty.value(workers.at(n));
+        const QString& worker              = workers.at(n);
+        const QStringList& availabitilties = workersAvailabitilty.value(worker);
+
+        if (availabitilties.size() != num_days)
+        {
+            qInfo() << "worker" << worker << "has invalid availabilities";
+            continue;
+        }
+
         for (int d : all_slots)
         {
             std::vector<IntVar> x;
@@ -252,11 +273,10 @@ void Planner::ScheduleRequestsSat()
 
     if (response.status() == CpSolverStatus::OPTIMAL || response.status() == CpSolverStatus::FEASIBLE)
     {
-        const QMap<QString, QStringList>& skills = m_skillHourModel->workersSkills();
-        const QStringList& workers               = m_skillHourModel->workers();
-        const QStringList& dates                 = m_availabilityModel->dates();
+        const QMap<QString, WorkerSet>& workersSets = m_skillHourModel->workers();
+        const QStringList& workers                  = m_skillHourModel->workersNames();
 
-        for (qint32 i = 0; i < G::ShiftsCount; ++i)
+        for (qint32 i = 0; i < num_shifts; ++i)
         {
             m_schedule[i].clear();
             m_schedule[i].resize(num_slots);
@@ -264,7 +284,6 @@ void Planner::ScheduleRequestsSat()
 
         for (int d : all_slots)
         {
-            LOG(INFO) << "Day " << dates.at(d / G::SlotsPerDay).toStdString() << " - " << G::PartsNames.at(d % G::SlotsPerDay).toStdString();
             for (int n : all_workers)
             {
                 for (int s : all_shifts)
@@ -272,19 +291,9 @@ void Planner::ScheduleRequestsSat()
                     auto key = std::make_tuple(n, d, s);
                     if (SolutionIntegerValue(response, shifts[key]))
                     {
-                        if (skills.value(workers.at(n)).first().isEmpty())
-                        {
-                            LOG(INFO) << "  " << workers.at(n).toStdString() << " works " << G::ShiftsNames.at(s).toStdString();
-                        }
-                        else
-                        {
-                            LOG(INFO) << "  " << workers.at(n).toStdString() << " [S] works " << G::ShiftsNames.at(s).toStdString();
-                        }
-
                         m_schedule[s][d].push_back(n);
 
-
-                        Q_ASSERT(!workerSkills.contains(G::ShiftsNames.at(s)));
+                        Q_ASSERT(workersSets.value(workers.at(n)).m_skills.skills.at(s) > Skills::None);
                     }
                 }
             }
@@ -296,18 +305,35 @@ void Planner::ScheduleRequestsSat()
     LOG(INFO) << CpSolverResponseStats(response);
 }
 
-void Planner::Plan(AvailabilityTableModel* availabilityModel, SkillHourTableModel* skillHourModel)
+bool Planner::Validate()
+{
+    //    const QStringList& workersNames             = m_skillHourModel->workersNames();
+    //    const QStringList& availabilityWorkersNames = m_availabilityModel->workersNames();
+
+    //    if (QSet<QString>(workersNames.cbegin(), workersNames.cend()) !=
+    //        QSet<QString>(availabilityWorkersNames.cbegin(), availabilityWorkersNames.cend()))
+    //    {
+    //        qInfo() << "invalid data, inconsistent workers names";
+    //        return false;
+    //    }
+
+    return true;
+}
+
+void Planner::Plan(AvailabilityTableModel* availabilityModel, WorkersModel* skillHourModel, ShiftsTableModel* shiftsTableModel)
 {
     m_availabilityModel = availabilityModel;
     m_skillHourModel    = skillHourModel;
+    m_shiftsTableModel  = shiftsTableModel;
 
-    // validate
+    if (Validate())
+    {
+        // generate
+        qDebug() << "planning...";
+        ScheduleRequestsSat();
 
-    // generate
-    qDebug() << "planning...";
-    ScheduleRequestsSat();
+        qDebug() << "got it";
 
-    qDebug() << "got it";
-
-    emit Planned(m_schedule);
+        emit Planned(m_schedule);
+    }
 }

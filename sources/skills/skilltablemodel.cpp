@@ -5,26 +5,59 @@
 #include <QDebug>
 #include <QPointer>
 
-SkillHourTableModel::SkillHourTableModel(QObject* parent) : QAbstractTableModel(parent)
+const QLatin1String SeniorText = QLatin1String("senior");
+const QLatin1String BasicText  = QLatin1String("ano");
+const QLatin1String NoneText   = QLatin1String("ne");
+
+namespace TablePositions
+{
+    const qint32 Surname         = 1;
+    const qint32 Name            = 2;
+    const qint32 BookingSkill    = 9;
+    const qint32 ResidencesSkill = 10;
+    const qint32 CovidSkill      = 11;
+} // namespace TablePositions
+
+QString name(const QStringList& splittedRow)
+{
+    return QString("%1 %2").arg(splittedRow.at(TablePositions::Surname), splittedRow.at(TablePositions::Name)).toLower().simplified();
+}
+
+Skills::SkillLevel booking(const QStringList& splittedRow)
+{
+    return Skills::TextToSkillLevel(splittedRow.at(TablePositions::BookingSkill));
+}
+
+Skills::SkillLevel residences(const QStringList& splittedRow)
+{
+    return Skills::TextToSkillLevel(splittedRow.at(TablePositions::ResidencesSkill));
+}
+
+Skills::SkillLevel covid(const QStringList& splittedRow)
+{
+    return Skills::TextToSkillLevel(splittedRow.at(TablePositions::CovidSkill));
+}
+
+WorkersModel::WorkersModel(QObject* parent) : QAbstractTableModel(parent)
 {
     //
 }
 
-int SkillHourTableModel::rowCount(const QModelIndex& parent) const
+int WorkersModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent)
 
-    return m_workers.count();
+    return m_workersNames.count();
 }
 
-int SkillHourTableModel::columnCount(const QModelIndex& parent) const
+int WorkersModel::columnCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent)
 
-    return G::SkillsNames.count() + 1; // + 1 because of hours column
+    return G::SkillsNames.count() + 2; // + 2 because of [name, residences, booking, covid, hours]
 }
 
-QVariant SkillHourTableModel::data(const QModelIndex& index, int role) const
+QVariant WorkersModel::data(const QModelIndex& index, int role) const
 {
     if (!index.isValid() || index.row() >= rowCount(QModelIndex()) || index.column() >= columnCount(QModelIndex()))
     {
@@ -33,82 +66,146 @@ QVariant SkillHourTableModel::data(const QModelIndex& index, int role) const
 
     if (role == Qt::DisplayRole)
     {
-        const QString& worker = m_workers.at(index.row());
-        if (index.column() < G::SkillsNames.count())
+        const QString& worker = m_workersNames.at(index.row());
+        if (index.column() == 0)
         {
-            return m_workersSkills.value(worker).at(index.column());
+            return worker;
         }
-        else if (index.column() == G::SkillsNames.count())
+        else if (index.column() < G::SkillsNames.count() + 1) // becuse in the first column, there is the name
         {
-            return m_workersHours.value(worker);
+            const Skills& skills = m_workers.value(worker).m_skills;
+            return Skills::SkillLevelToText(skills.skills.at(index.column() - 1)); // becuse in the first column, there is the name
+        }
+        else if (index.column() == G::SkillsNames.count() + 1)
+        {
+            return m_workers.value(worker).m_hours;
         }
     }
 
     return QVariant();
 }
 
-QVariant SkillHourTableModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant WorkersModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role == Qt::DisplayRole)
     {
         if (orientation == Qt::Horizontal)
         {
-            if (section < G::SkillsNames.count())
+            if (section == 0)
             {
-                return G::SkillsNames.value(section);
+                return "Name";
             }
-            else if (section == G::SkillsNames.count())
+            else if (section < G::SkillsNames.count() + 1)
+            {
+                return G::SkillsNames.value(section - 1);
+            }
+            else if (section == G::SkillsNames.count() + 1)
             {
                 return "Hours";
             }
         }
         else if (orientation == Qt::Vertical)
         {
-            if (section < m_workers.count())
-            {
-                return m_workers.at(section);
-            }
+            return section;
         }
     }
     return QVariant();
 }
 
-QStringList SkillHourTableModel::workers() const
+QStringList WorkersModel::workersNames() const
+{
+    return m_workersNames;
+}
+
+QMap<QString, WorkerSet> WorkersModel::workers() const
 {
     return m_workers;
 }
 
-QMap<QString, QStringList> SkillHourTableModel::workersSkills()
+void WorkersModel::setWorkersFromText(const QString& workersSkillsRaw, const bool project)
 {
-    return m_workersSkills;
-}
+    QStringList&& rows = workersSkillsRaw.split(QChar::LineFeed);
+    rows.removeFirst();
 
-QMap<QString, qint32> SkillHourTableModel::workersHours()
-{
-    return m_workersHours;
-}
+    beginResetModel();
 
-void SkillHourTableModel::setWorkersSkillsAndHours(const QStringList& workersSkills)
-{
-    m_workers.clear();
-    m_workersSkills.clear();
-    m_workersHours.clear();
-
-    for (const QString& row : workersSkills)
+    for (const QString& row : rows)
     {
-        if (row.isEmpty())
+        if (row.trimmed().isEmpty())
         {
+            break; // no more valid data
+        }
+
+        const QStringList& splittedRow = row.split(QChar::Tabulation);
+        const QString& workerName      = name(splittedRow);
+
+        if (m_workersNames.contains(workerName))
+        {
+            qInfo() << "operator" << workerName << "exists";
             continue;
         }
 
-        QStringList workerSkills = row.split(QChar::Tabulation);
-        m_workers.append(workerSkills.takeFirst());
+        m_workersNames.append(workerName);
 
-        m_workersHours[m_workers.last()]  = workerSkills.takeLast().toInt();
-        m_workersSkills[m_workers.last()] = workerSkills;
+        m_workers[m_workersNames.last()].m_project = project;
+        m_workers[m_workersNames.last()].m_skills  = Skills{.skills{
+          residences(splittedRow),
+          booking(splittedRow),
+          covid(splittedRow),
+        }};
+        m_workers[m_workersNames.last()].m_hours   = G::MaxHoursPerMonth;
     }
 
-    emit headerDataChanged(Qt::Vertical, 0, m_workers.count() - 1);
-    emit dataChanged(index(0, 0), index(m_workers.count() - 1, G::SkillsNames.count())); // +1 because of hours column
-    emit workersChanged(m_workers);
+    endResetModel();
+
+    emit workersChanged(m_workersNames);
+
+    qInfo() << (project ? "project" : "non-project") << "workers set";
+}
+
+bool Skills::ResidencesSkill() const
+{
+    return skills.at(G::ShiftTypes::Residences) > SkillLevel::None;
+}
+
+bool Skills::BookingSkill() const
+{
+    return skills.at(G::ShiftTypes::Booking) > SkillLevel::None;
+}
+
+bool Skills::CovidSkill() const
+{
+    return skills.at(G::ShiftTypes::Covid) > SkillLevel::None;
+}
+
+Skills::SkillLevel Skills::TextToSkillLevel(const QString& levelRaw)
+{
+    SkillLevel level = None;
+
+    if (levelRaw == BasicText)
+    {
+        level = Basic;
+    }
+    else if (levelRaw == SeniorText)
+    {
+        level = Senior;
+    }
+
+    return level;
+}
+
+QString Skills::SkillLevelToText(const SkillLevel level)
+{
+    QString rawLevel = NoneText;
+
+    if (level == Basic)
+    {
+        rawLevel = BasicText;
+    }
+    else if (level == Senior)
+    {
+        rawLevel = SeniorText;
+    }
+
+    return rawLevel;
 }
