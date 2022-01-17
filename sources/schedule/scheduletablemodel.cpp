@@ -184,8 +184,10 @@ void ScheduleTableModel::setSchedule(std::array<std::vector<std::vector<int>>, G
         m_workersIdsPerShift[i].append(workersIdsPerShift.at(i).values());
     }
 
-    m_rows    = std::accumulate(m_workersCount.begin(), m_workersCount.end(), 0) + 3; // [booking, names, residences, names, covid, names]
-    m_columns = schedule.front().size() / 2 + 1 + 1;                                  // [names, dates, total hours]
+    // [booking, names, missing, residences, names, missing, covid, names, missing]
+    m_rows = std::accumulate(m_workersCount.begin(), m_workersCount.end(), 0) + 3 /* + 3*/;
+    // [names, dates, total hours]
+    m_columns = schedule.front().size() / 2 + 1 + 1;
 
     emit dataChanged(index(0, 0), index(m_rows - 1, m_columns - 1));
 

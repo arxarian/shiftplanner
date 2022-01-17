@@ -15,6 +15,7 @@ unix {
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    sources/copytableview.cpp \
     sources/main.cpp \
     sources/mainwindow.cpp \
     sources/planner/planner.cpp \
@@ -32,6 +33,7 @@ SOURCES += \
     sources/shifts/shiftmodel.cpp
 
 HEADERS += \
+    sources/copytableview.h \
     sources/global.h \
     sources/mainwindow.h \
     sources/planner/planner.h \

@@ -93,7 +93,7 @@
     <item row="1" column="0">
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="pageWorkers">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -267,7 +267,7 @@
          </layout>
         </item>
         <item row="1" column="0">
-         <widget class="QTableView" name="tableViewSchedule"/>
+         <widget class="CopyTableView" name="tableViewSchedule"/>
         </item>
        </layout>
       </widget>
@@ -281,12 +281,19 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CopyTableView</class>
+   <extends>QTableView</extends>
+   <header location="global">sources/copytableview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
