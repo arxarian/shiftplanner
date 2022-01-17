@@ -32,4 +32,7 @@ private:
     QStringList m_dates;
     qint32 m_rows    = 0;
     qint32 m_columns = 0;
+
+private:
+    std::tuple<qint32, qint32> ShiftTypeAndRow(const qint32 originalRow) const;
 };

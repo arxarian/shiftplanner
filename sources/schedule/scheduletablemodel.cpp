@@ -34,20 +34,10 @@ QVariant ScheduleTableModel::data(const QModelIndex& index, int role) const
 
     if (role == Qt::DisplayRole)
     {
-        qint32 shift = 0;
-        qint32 row   = index.row();
+        const std::tuple<qint32, qint32>& shiftTypeAndRow = ShiftTypeAndRow(index.row());
 
-        for (; shift < G::ShiftsCount; ++shift)
-        {
-            if (row - m_workersCount[shift] > 0)
-            {
-                row = row - m_workersCount[shift] - 1;
-            }
-            else
-            {
-                break;
-            }
-        }
+        const qint32 shift = std::get<0>(shiftTypeAndRow);
+        qint32 row         = std::get<1>(shiftTypeAndRow);
 
         bool description = false;
         if (row == 0)
@@ -128,12 +118,19 @@ QVariant ScheduleTableModel::data(const QModelIndex& index, int role) const
             }
         }
     }
-    //    else if (role == Qt::FontRole && index.column() == 0)
-    //    { // First column items are bold.
-    //        QFont font;
-    //        font.setBold(true);
-    //        return font;
-    //    }
+    else if (role == Qt::FontRole)
+    {
+        const std::tuple<qint32, qint32>& shiftTypeAndRow = ShiftTypeAndRow(index.row());
+        const qint32 row                                  = std::get<1>(shiftTypeAndRow);
+
+        if (row == 0)
+        {
+            // First column items are bold.
+            QFont font;
+            font.setBold(true);
+            return font;
+        }
+    }
 
     return QVariant();
 }
@@ -194,4 +191,24 @@ void ScheduleTableModel::setSchedule(std::array<std::vector<std::vector<int>>, G
 
     emit headerDataChanged(Qt::Horizontal, 0, m_columns);
     emit headerDataChanged(Qt::Vertical, 0, m_rows);
+}
+
+std::tuple<qint32, qint32> ScheduleTableModel::ShiftTypeAndRow(const qint32 originalRow) const
+{
+    qint32 shift = 0;
+    qint32 row   = originalRow;
+
+    for (; shift < G::ShiftsCount; ++shift)
+    {
+        if (row - m_workersCount[shift] > 0)
+        {
+            row = row - m_workersCount[shift] - 1;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    return std::make_tuple(shift, row);
 }
