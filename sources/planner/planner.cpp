@@ -72,7 +72,7 @@ void Planner::ScheduleRequestsSat()
     CpModelBuilder cp_model;
 
     //! variables definition
-    // shifts[(n, d, s)] equals 1 if shift s is assigned to nurse n on day d, and 0 otherwise
+    // shifts[(n, d, s)] equals 1 if shift s is assigned to worker n on day d, and 0 otherwise
     std::map<std::tuple<int, int, int>, IntVar> shifts;
     for (int n : all_workers)
     {
@@ -99,11 +99,11 @@ void Planner::ScheduleRequestsSat()
     {
         // TODO - need to set year
         // TODO - move date validation to availability model
-        const QDate& date = QDate::fromString(QString("%1 %2").arg(dates.at(d / 2)).arg(QDate::currentDate().year()), "d.M. yyyy");
+        const QDate& date = QDate::fromString(QString("%1 %2").arg(dates.at(d / 2)).arg(2021), "d.M. yyyy");
 
         Q_ASSERT(date.isValid());
 
-        if (date.day() == 17) // a nation holiday
+        if (date.day() == 17) // a Czech national holiday
         {
             // TODO - a big hack for now
             continue;
@@ -144,9 +144,6 @@ void Planner::ScheduleRequestsSat()
             }
             else
             {
-                //                IntVar obj = cp_model.NewIntVar(0, num_workers, "");
-                //                cp_model
-                //                  .AddMinEquality(obj, workload)
 
                 cp_model.AddLessOrEqual(/*shiftLimits.at(dayOfWeek - 1).minimal*/ 0, LinearExpr::Sum(x)); // TODO - optimize min workers
                 cp_model.AddLessOrEqual(LinearExpr::Sum(x), shiftLimits.at(dayOfWeek - 1).maximal);
