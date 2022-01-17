@@ -93,6 +93,8 @@ void Planner::ScheduleRequestsSat()
     const QStringList& workers                  = m_skillHourModel->workersNames();
     const QMap<QString, WorkerSet>& workersSets = m_skillHourModel->workers();
 
+    std::vector<IntVar> y;
+
     for (int d : all_slots) // ALL DAYS {MORNING, AFTERNOON}
     {
         // TODO - need to set year
@@ -129,6 +131,7 @@ void Planner::ScheduleRequestsSat()
                 {
                     auto key = std::make_tuple(n, d, s);
                     x.push_back(shifts[key]);
+                    y.push_back(shifts[key]);
                 }
             }
 
@@ -141,11 +144,17 @@ void Planner::ScheduleRequestsSat()
             }
             else
             {
-                cp_model.AddLessOrEqual(shiftLimits.at(dayOfWeek - 1).minimal, LinearExpr::Sum(x));
+                //                IntVar obj = cp_model.NewIntVar(0, num_workers, "");
+                //                cp_model
+                //                  .AddMinEquality(obj, workload)
+
+                cp_model.AddLessOrEqual(/*shiftLimits.at(dayOfWeek - 1).minimal*/ 0, LinearExpr::Sum(x)); // TODO - optimize min workers
                 cp_model.AddLessOrEqual(LinearExpr::Sum(x), shiftLimits.at(dayOfWeek - 1).maximal);
             }
         }
     }
+
+    cp_model.Maximize(LinearExpr::Sum(y));
 
     //    //! each slot need to have at least one senior worker, one project worker and one non-project worker
     //    for (int d : all_slots)
