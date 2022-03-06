@@ -200,7 +200,7 @@ void Planner::ScheduleRequestsSat()
             }
         }
         const QString& worker = workers.at(n);
-        cp_model.AddLessOrEqual(LinearExpr::Sum(x), workersSets.value(worker).m_hours / 4); // each slot has four hours
+        cp_model.AddLessOrEqual(LinearExpr::Sum(x), workersSets.value(worker).m_hours);
     }
 
     //! each worker works at most one slot according to his/her requirements

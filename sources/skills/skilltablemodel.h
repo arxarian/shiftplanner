@@ -27,7 +27,7 @@ struct WorkerSet
 {
     bool m_project = false;
     Skills m_skills;
-    qint32 m_hours = G::MaxHoursPerMonth;
+    qint32 m_hours = G::MaxSlotsPerMonth;
 };
 
 class WorkersModel : public QAbstractTableModel

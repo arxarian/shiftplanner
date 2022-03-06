@@ -153,7 +153,7 @@ void WorkersModel::setWorkersFromText(const QString& workersSkillsRaw, const boo
           booking(splittedRow),
           covid(splittedRow),
         }};
-        m_workers[m_workersNames.last()].m_hours   = G::MaxHoursPerMonth;
+        m_workers[m_workersNames.last()].m_hours   = G::MaxSlotsPerMonth;
     }
 
     endResetModel();
